@@ -10,15 +10,13 @@ Environmental DNA metabarcoding as an efficient tool to monitor freshwater syste
 Hydrobiologia, 852, 791–803. https://doi.org/10.1007/s10750-024-05723-y
 
 📁 Repository Structure
-bash
-Copy
-Edit
 repliSTREAM/
 ├── scripts/
 │   └── PCoA/            # R scripts and input files for ordination and beta diversity
 ├── results/
 │   └── PCoA/            # Figures and outputs (e.g., PCoA plots, PERMDISP)
 ├── README.md            # This file
+
 🔬 Pipelines Compared
 Pipeline	Description
 Barque + LULU + microDecon	Original pipeline from the paper (command line, OTU-based)
