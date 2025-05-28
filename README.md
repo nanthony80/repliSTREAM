@@ -13,12 +13,7 @@ Ballini, L., Staffoni, G., Nespoli, D. et al. (2025). *Environmental DNA metabar
 
 ### 📁 Repository Structure
 
-repliSTREAM/
-├── scripts/
-│   └── PCoA/            # R scripts and input files for ordination and beta diversity
-├── results/
-│   └── PCoA/            # Figures and outputs (e.g., PCoA plots, PERMDISP)
-├── README.md            # This file
+<pre> repliSTREAM/ ├── scripts/ │ └── PCoA/ # R scripts and input files for ordination and beta diversity ├── results/ │ └── PCoA/ # Figures and outputs (e.g., PCoA plots, PERMDISP) ├── README.md # This file </pre>
 
 ---
 
