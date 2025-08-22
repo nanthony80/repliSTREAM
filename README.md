@@ -4,7 +4,7 @@
 
 **Reproducibility and pipeline comparison using eDNA metabarcoding data from Italian freshwater rivers by Ballini et al. (2024).**
 
-repliSTREAM is a project aimed at replicating and extending the environmental DNA (eDNA) metabarcoding analysis of Ballini et al. (2024), evaluating the reproducibility of their use of the command-line interface (CLI)-based Barque pipeline and comparing it with two other pipelines: APSCALE-CLI and the eDNA-Container App, a graphical user interface (GUI) pipeline. The publicly available dataset includes eDNA samples from six river systems in northwestern Italy, amplified with two 12S rRNA markers: tele02 and vert01. All scripts, instructions, and results provided here enable full replication, comparison, and visualization of pipeline outputs, facilitating transparent and reproducible research in eDNA metabarcoding.
+repliSTREAM is a project aimed at replicating and extending the environmental DNA (eDNA) metabarcoding analysis of Ballini et al. (2024), evaluating the reproducibility of their use of the command-line interface (CLI)-based Barque pipeline and comparing it with two other pipelines: APSCALE-CLI and the eDNA-Container App, a graphical user interface (GUI) pipeline. The publicly available dataset includes eDNA samples from six river systems in northwestern Italy, amplified with two 12S rRNA markers: tele02 (Taberlet et al., 2018) and vert01 (Riaz et al., 2011). All scripts, instructions, and results provided here enable full replication, comparison, and visualization of pipeline outputs, facilitating transparent and reproducible research in eDNA metabarcoding.
 
 ---
 
@@ -23,6 +23,9 @@ repliSTREAM is a project aimed at replicating and extending the environmental DN
 | **Barque**              | CLI pipeline for DNA metabarcoding originally used by Ballini et al. (2024); OTU-based; integrates Trimmomatic, FLASH, custom Python scripts, and VSEARCH. LULU and microDecon were run separately after Barque. |
 | **APSCALE + LULU**      | CLI pipeline for DNA metabarcoding; OTU-based; integrates VSEARCH, cutadapt, and LULU. microDecon was run after APSCALE. |
 | **eDNA-Container App**  | Graphical user interface (GUI) pipeline for DNA metabarcoding; ASV-based; runs on QIIME2. LULU and microDecon were run separately after the main analysis. |
+
+---
+<img width="619" height="408" alt="Screenshot 2025-08-22 at 6 34 54 PM" src="https://github.com/user-attachments/assets/bb7788d0-3b4e-4a36-be54-750d13c82b2a" />
 
 ---
 
