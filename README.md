@@ -43,6 +43,7 @@ GitHub: [@nanthony80](https://github.com/nanthony80)
 
 ### Acknowledgements
 **Daniel Stratis**
+
 GitHub: [@dswede43](https://github.com/dswede43)
 
 ---
