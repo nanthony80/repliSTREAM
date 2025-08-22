@@ -6,7 +6,7 @@ repliSTREAM is a project aimed at replicating and extending the environmental DN
 
 ---
 
-### 📚 Citations  
+### Citations  
 Ballini, L., Staffoni, G., Nespoli, D. et al. Environmental DNA metabarcoding as an efficient tool to monitor freshwater systems in northwestern Italy. Hydrobiologia 852, 791–803 (2025). https://doi.org/10.1007/s10750-024-05723-y
 
 Buchner, D., Macher, T. H., & Leese, F. (2022). APSCALE: advanced pipeline for simple yet comprehensive analyses of DNA metabarcoding data. Bioinformatics (Oxford, England), 38(20), 4817–4819. https://doi.org/10.1093/bioinformatics/btac588
@@ -16,7 +16,7 @@ Wheeler, D., Brancalion, L., Kawasaki, A., & Rourke, M. L. (2024). The eDNA-Cont
 
 ---
 
-### 🔬 Pipelines Compared
+### Pipelines Compared
 
 | Pipeline            | Description                                                                                 |
 |---------------------|---------------------------------------------------------------------------------------------|
@@ -26,7 +26,7 @@ Wheeler, D., Brancalion, L., Kawasaki, A., & Rourke, M. L. (2024). The eDNA-Cont
 
 ---
 
-### 🧠 Notes
+### Notes
 
 - All intermediate steps are documented for reproducibility.  
 - Raw data were obtained from Ballini et al. (2024).  
@@ -35,9 +35,15 @@ Wheeler, D., Brancalion, L., Kawasaki, A., & Rourke, M. L. (2024). The eDNA-Cont
 
 ---
 
-### 👩‍🔬 Author  
+### Author  
 **Nicole Anthony**  
 GitHub: [@nanthony80](https://github.com/nanthony80)
+
+---
+
+### 👩‍🔬 Acknowledgements
+**Daniel Stratis**
+GitHub: [@dswede43](https://github.com/dswede43)
 
 ---
 
