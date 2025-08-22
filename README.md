@@ -22,7 +22,7 @@ Wheeler, D., Brancalion, L., Kawasaki, A., & Rourke, M. L. (2024). The eDNA-Cont
 |---------------------|---------------------------------------------------------------------------------------------|
 | Barque              | CLI pipeline for DNA metabarcoding originally used by Ballini et al. (2024); OTU-based; integrates Trimmomatic, FLASH, custom Python scripts, and VSEARCH. LULU and microDecon were run separately after Barque. |
 | APSCALE + LULU      | CLI pipeline for DNA metabarcoding; OTU-based; integrates VSEARCH, cutadapt, and LULU. microDecon was run after APSCALE. |
-| eDNA-Container App  | Graphical user interface (GUI) pipeline for DNA metabarcoding; ASV-based (QIIME2 backend). LULU and microDecon were run separately after the main analysis. |
+| eDNA-Container App  | Graphical user interface (GUI) pipeline for DNA metabarcoding; ASV-based; runs on QIIME2. LULU and microDecon were run separately after the main analysis. |
 
 ---
 
