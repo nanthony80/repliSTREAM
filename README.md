@@ -16,53 +16,13 @@ Wheeler, D., Brancalion, L., Kawasaki, A., & Rourke, M. L. (2024). The eDNA-Cont
 
 ---
 
-### 📁 Repository Structure
-
-```
-repliSTREAM/
-├── scripts/
-│   └── PCoA/            # R scripts and input files for ordination and beta diversity
-├── results/
-│   └── PCoA/            # Figures and outputs (e.g., PCoA plots, PERMDISP)
-├── README.md            # This file
-```
-
----
-
 ### 🔬 Pipelines Compared
 
 | Pipeline            | Description                                                                                 |
 |---------------------|---------------------------------------------------------------------------------------------|
-| Barque              | Command-line interface (CLI) pipeline for DNA metabarcoding; OTU-based. LULU and microDecon were run separately after Barque. |
-| APSCALE + LULU      | Platform-independent CLI pipeline for DNA metabarcoding; OTU-based; integrates VSEARCH, cutadapt, and LULU. microDecon was run after APSCALE. |
+| Barque              | CLI pipeline for DNA metabarcoding originally used by Ballini et al. (2024); OTU-based; integrates Trimmomatic, FLASH, custom Python scripts, and VSEARCH. LULU and microDecon were run separately after Barque. |
+| APSCALE + LULU      | CLI pipeline for DNA metabarcoding; OTU-based; integrates VSEARCH, cutadapt, and LULU. microDecon was run after APSCALE. |
 | eDNA-Container App  | Graphical user interface (GUI) pipeline for DNA metabarcoding; ASV-based (QIIME2 backend). LULU and microDecon were run separately after the main analysis. |
-
----
-
-### 📊 Completed Analyses (Barque Data)
-
-✅ PCoA ordination by river and primer (with ellipses)  
-✅ Faceted PCoA to compare marker resolution (tele02 vs vert01)  
-✅ PERMANOVA testing river, marker, and interaction effects  
-✅ PERMDISP comparing beta diversity dispersion across markers  
-
----
-
-### 🧩 Planned Analyses (in progress)
-
-⏳ Circlize/UpSet plot comparing taxa from Barque, eDNA-Container App, and Ballini et al.  
-⏳ Taxonomic barplots and richness metrics from eDNA-Container App outputs  
-⏳ Re-run PCoA and PERMANOVA using eDNA-Container App outputs for comparison  
-⏳ Final synthesis of overlap and divergence between pipelines  
-
----
-
-### 📌 Project Goals
-
-- Replicate the published Barque-based eDNA pipeline using public data  
-- Compare outputs from Barque and eDNA-Container App pipelines  
-- Evaluate marker performance (tele02 vs vert01)  
-- Demonstrate reproducibility and flexibility of eDNA metabarcoding pipelines  
 
 ---
 
@@ -83,4 +43,4 @@ GitHub: [@nanthony80](https://github.com/nanthony80)
 
 ### 📜 License  
 This project is for educational and research purposes.  
-See Ballini et al. (2024) for original data and pipeline licensing.
+See Ballini et al. (2024) for original data.
