@@ -18,8 +18,8 @@ repliSTREAM is a project aimed at replicating and extending the environmental DN
 
 ## Pipelines Compared
 
-| Pipeline                | Description                                                                                 |
-|-------------------------|---------------------------------------------------------------------------------------------|
+| Pipeline                       | Description                                                                                 |
+|--------------------------------|---------------------------------------------------------------------------------------------|
 | **Barque>LULU>microDecon**              | CLI pipeline for DNA metabarcoding originally used by Ballini et al. (2024); OTU-based; integrates Trimmomatic, FLASH, custom Python scripts, and VSEARCH. LULU and microDecon were run separately after Barque. |
 | **APSCALE(LULU)>microDecon**      | CLI pipeline for DNA metabarcoding; OTU-based; integrates VSEARCH, cutadapt, and LULU. microDecon was run after APSCALE. |
 | **eDNA-Container App>LULU>microDecon**  | Graphical user interface (GUI) pipeline for DNA metabarcoding; ASV-based; runs on QIIME2. LULU and microDecon were run separately after the main analysis. |
