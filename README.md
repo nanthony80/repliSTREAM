@@ -31,7 +31,7 @@ Wheeler, D., Brancalion, L., Kawasaki, A., & Rourke, M. L. (2024). The eDNA-Cont
 - All intermediate steps are documented for reproducibility.  
 - Raw data were obtained from Ballini et al. (2024).  
 - Curated reference database and naming conventions follow the original GitHub:  
-  👉 [https://github.com/giorgiastaffoni/STREAM](https://github.com/giorgiastaffoni/STREAM)
+  [https://github.com/giorgiastaffoni/STREAM](https://github.com/giorgiastaffoni/STREAM)
 
 ---
 
@@ -41,12 +41,12 @@ GitHub: [@nanthony80](https://github.com/nanthony80)
 
 ---
 
-### 👩‍🔬 Acknowledgements
+### Acknowledgements
 **Daniel Stratis**
 GitHub: [@dswede43](https://github.com/dswede43)
 
 ---
 
-### 📜 License  
+### License  
 This project is for educational and research purposes.  
 See Ballini et al. (2024) for original data.
