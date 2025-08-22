@@ -31,10 +31,11 @@ repliSTREAM/
 
 ### 🔬 Pipelines Compared
 
-| Pipeline              | Description                                           |
-|-----------------------|-------------------------------------------------------|
-| Barque + LULU + microDecon | Original pipeline from the paper (CLI, OTU-based)     |
-| eDNA-Container App    | GUI-based pipeline using QIIME2 (ASV-based, via Docker) |
+| Pipeline                                | Description                                                                                   |
+|------------------------------------------|-----------------------------------------------------------------------------------------------|
+| Barque + LULU + microDecon              | Command-line interface (CLI) pipeline for DNA metabarcoding; OTU-based; integrates LULU for post-clustering curation and microDecon for contamination removal. |
+| APSCALE + LULU + microDecon             | Platform-independent CLI pipeline for DNA metabarcoding; OTU-based; integrates VSEARCH, cutadapt, LULU for post-clustering curation, and microDecon for contamination removal. |
+| eDNA-Container App (QIIME2 backend) + LULU + microDecon | Graphical user interface (GUI) pipeline for DNA metabarcoding; ASV-based (QIIME2); integrates LULU for post-clustering curation and microDecon for contamination removal. |
 
 All results were converted to **presence/absence matrices** and analyzed in **R** using Bray-Curtis dissimilarity and ordination statistics.
 
