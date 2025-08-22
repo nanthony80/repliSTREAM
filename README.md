@@ -26,8 +26,8 @@ repliSTREAM is a project aimed at replicating and extending the environmental DN
 
 ---
 ## Bioinformatics Workflow
-<img width="584" height="377" alt="Screenshot 2025-08-22 at 6 36 57 PM" src="https://github.com/user-attachments/assets/92d0189d-5711-4147-9eca-8590b1326f84" />
 
+<img width="576" height="380" alt="Screenshot 2025-08-22 at 6 43 49 PM" src="https://github.com/user-attachments/assets/da668b75-efcb-42c5-9817-6de3f037e41b" />
 
 ---
 
