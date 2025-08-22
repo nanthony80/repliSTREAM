@@ -25,7 +25,8 @@ repliSTREAM is a project aimed at replicating and extending the environmental DN
 | **eDNA-Container App**  | Graphical user interface (GUI) pipeline for DNA metabarcoding; ASV-based; runs on QIIME2. LULU and microDecon were run separately after the main analysis. |
 
 ---
-<img width="619" height="408" alt="Screenshot 2025-08-22 at 6 34 54 PM" src="https://github.com/user-attachments/assets/bb7788d0-3b4e-4a36-be54-750d13c82b2a" />
+<img width="590" height="409" alt="Screenshot 2025-08-22 at 6 36 57 PM" src="https://github.com/user-attachments/assets/36fba23f-0e82-443f-ac57-4c78f00fc746" />
+
 
 ---
 
