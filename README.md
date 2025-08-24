@@ -56,6 +56,8 @@ GitHub: [@nanthony80](https://github.com/nanthony80)
 **Daniel Stratis**  
 GitHub: [@dswede43](https://github.com/dswede43)
 
+I am grateful to my project partner, Daniel Stratis, for his collaboration throughout this work, including identifying Ballini et al. (2024) as a suitable study for learning eDNA metabarcoding bioinformatics, supporting the curation of the CRABS reference database, advising on pipeline troubleshooting and analyses, and providing consistent feedback and encouragement along the way.
+
 ---
 
 ## License
@@ -64,7 +66,7 @@ GitHub: [@dswede43](https://github.com/dswede43)
 
 ---
 
-## Citations
+## References
 
 - **Ballini, L., Staffoni, G., Nespoli, D., et al. (2025).** Environmental DNA metabarcoding as an efficient tool to monitor freshwater systems in northwestern Italy. *Hydrobiologia, 852,* 791–803. [https://doi.org/10.1007/s10750-024-05723-y](https://doi.org/10.1007/s10750-024-05723-y)
 - **Buchner, D., Macher, T. H., & Leese, F. (2022).** APSCALE: advanced pipeline for simple yet comprehensive analyses of DNA metabarcoding data. *Bioinformatics* 38(20), 4817–4819. [https://doi.org/10.1093/bioinformatics/btac588](https://doi.org/10.1093/bioinformatics/btac588)
