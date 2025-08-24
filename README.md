@@ -62,7 +62,7 @@ I am grateful to my project partner, Daniel Stratis, for his collaboration throu
 
 ## License
  
-*This project is for educational and research purposes. Original data belong to Ballini et al. (2024).*
+This project is for educational and research purposes. Original data belong to Ballini et al. (2024).
 
 ---
 
