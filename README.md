@@ -29,7 +29,7 @@ This project is part of my personal learning journey in eDNA metabarcoding bioin
 ---
 ## Bioinformatics Workflow
 
-<img width="700" height="474" alt="Screenshot 2025-08-24 at 3 18 49 PM" src="https://github.com/user-attachments/assets/3cf472b0-9f3e-4f56-894a-abd68ca9f343" />
+<img width="718" height="500" alt="Screenshot 2025-08-24 at 4 10 05 PM" src="https://github.com/user-attachments/assets/81c89f8e-6679-4638-8b9f-10805e8d2a06" />
 
 *Figure 1. Overview of the repliSTREAM workflow comparing Barque, APSCALE, and eDNA-Container App pipelines (created with BioRender.com).*
 
