@@ -2,7 +2,7 @@
 
 ## Introduction
 
-### Reproducibility and pipeline comparison using eDNA metabarcoding data from Italian freshwater rivers from Ballini et al., 2024.
+### Reproducibility and pipeline comparison using eDNA metabarcoding data from Italian freshwater rivers from Ballini et al. 2024.
 
 repliSTREAM is a project aimed at reproducing and extending the environmental DNA (eDNA) metabarcoding analysis of Ballini et al. (2024), with emphasis on freshwater fish biodiversity. Although the original study also reported amphibians, birds, and mammals from its multi-marker approach, this project limits its scope to fish taxa to directly replicate the core biodiversity results of the original study.
 
