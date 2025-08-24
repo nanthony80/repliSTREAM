@@ -8,7 +8,7 @@ repliSTREAM is a project aimed at reproducing and extending the environmental DN
 
 Using the publicly available dataset of eDNA samples from six rivers in northwestern Italy, amplified with two 12S rRNA markers (Tele02: Taberlet et al., 2018; Vert01: Riaz et al., 2011), repliSTREAM evaluates the reproducibility of the Barque command-line interface (CLI) pipeline and compares it with two alternatives: APSCALE-CLI and the GUI-based eDNA-Container App. All scripts, instructions, and results are provided to enable full replication, cross-pipeline comparison, and visualization of fish community outputs, supporting transparent and reproducible research in eDNA metabarcoding.
 
-This project is part of my learning journey in eDNA metabarcoding bioinformatics. I am not a professional researcher, so errors or oversights may be present. Feedback and suggestions are welcome to help improve it.
+This project is part of my personal learning journey in eDNA metabarcoding bioinformatics. I am not a professional researcher or bioinformatician, so errors or oversights may be present. Feedback and suggestions are welcome to help improve it.
 
 ---
 
