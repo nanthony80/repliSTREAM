@@ -37,9 +37,8 @@ This project is part of my personal learning journey in eDNA metabarcoding bioin
 
 ## Notes
 
-- Raw data were obtained from Ballini et al. (2024).
-- Barque pipeline followed the original GitHub:  
-  [https://github.com/giorgiastaffoni/STREAM](https://github.com/giorgiastaffoni/STREAM)
+- Raw data were obtained from [Ballini et al. (2024)](https://doi.org/10.1007/s10750-024-05723-y)
+- Barque pipeline followed the original GitHub by [@giorgiastaffoni](https://github.com/giorgiastaffoni/STREAM)
 - All intermediate steps are documented for reproducibility.
 
 ---
