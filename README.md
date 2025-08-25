@@ -6,7 +6,7 @@
 
 repliSTREAM is a project aimed at reproducing and extending the environmental DNA (eDNA) metabarcoding analysis of Ballini et al., 2024, with emphasis on freshwater fish biodiversity. Although the original study also reported amphibians, birds, and mammals from its multi-marker approach, this project limits its scope to fish taxa to directly replicate the core biodiversity results of the original study.
 
-Using the publicly available dataset of eDNA samples from six rivers in northwestern Italy, amplified with two 12S rRNA markers (Tele02: Taberlet et al., 2018; Vert01: Riaz et al., 2011), repliSTREAM evaluates the reproducibility of the Barque (Mathon et al. 2021) command-line interface (CLI) pipeline and compares it with two alternatives: APSCALE-CLI (Buchner et al., 2022) and the GUI-based eDNA-Container App (Wheeler et al., 2024). Post-clustering curation and decontamination steps were performed with LULU (Frøslev et al., 2017) and microDecon (McKnight et al., 2019) to ensure error reduction and contamination control across pipelines. All scripts, instructions, and results are provided to enable full replication, cross-pipeline comparison, and visualization of fish community outputs, supporting transparent and reproducible research in eDNA metabarcoding.
+Using the publicly available dataset of eDNA samples from six rivers in northwestern Italy, amplified with two 12S rRNA markers (Tele02: Taberlet et al., 2018; Vert01: Riaz et al., 2011), repliSTREAM evaluates the reproducibility of the Barque (Mathon et al. 2021) command-line interface (CLI) pipeline and compares it with two alternatives: APSCALE-CLI (Buchner et al., 2022) and the GUI-based eDNA-Container App (Wheeler et al., 2024). Vertebrate reference database creation was performed using Creating Reference databases for Amplicon-Based Sequencing (CRABS) (Jeunen et al., 2023). Post-clustering curation and decontamination steps were performed with LULU (Frøslev et al., 2017) and microDecon (McKnight et al., 2019) to ensure error reduction and contamination control across pipelines. All scripts, instructions, and results are provided to enable full replication, cross-pipeline comparison, and visualization of fish community outputs, supporting transparent and reproducible research in eDNA metabarcoding.
 
 This project is part of my personal learning journey in eDNA metabarcoding bioinformatics. I am not a professional researcher or bioinformatician, so errors or oversights may be present. Feedback and suggestions are welcome to help improve it.
 
@@ -38,19 +38,82 @@ This project is part of my personal learning journey in eDNA metabarcoding bioin
 ## Notes
 
 - Raw, demiltiplexed, paired-end Illumina data were obtained from [Ballini et al. (2024)](https://doi.org/10.1007/s10750-024-05723-y) and replication of the Barque>LULU>microDecon pipeline followed the original GitHub by [@giorgiastaffoni](https://github.com/giorgiastaffoni/STREAM) with some modifications.
+- APSCALE and eDNA-Container App pipelines were configured with settings as similar as possible to Barque; any differences are noted in the relevant sections.
 - For documentation and installation instructions, see:  
   - **Reference Database Creation**: [CRABS](https://github.com/gjeunen/reference_database_creator)  
   - **Pipelines**: [Barque](https://github.com/enormandeau/barque), [APSCALE](https://github.com/DominikBuchner/apscale), [eDNA-Container App](https://github.com/dwheelerau/edna-container)  
   - **Taxonomic Assignment for APSCALE**: [APSCALE-BLAST](https://github.com/TillMacher/apscale_blast), [TaxonTableTools2](https://github.com/TillMacher/TaxonTableTools2)
   - **Post-processing tools**: [LULU](https://github.com/tobiasgf/lulu), [microDecon](https://github.com/donaldtmcknight/microDecon)  
-- All intermediate steps are documented for reproducibility.
+
+---
+## Step-by-Step Workflow by Pipeline
+
+### 1. Barque Pipeline
+
+**Overview:**  
+Replication of Barque > LULU > microDecon pipeline as used in Ballini et al. (2024), with modifications.
+
+**Steps:**  
+1. **Data Download & Preparation**  
+   - [Download raw data and organize files](step01_data_download.md)
+2. **Reference Database Creation**  
+   - [CRABS curation for 12S rRNA fish reference](step02_reference_db.md)
+3. **Barque Analysis**  
+   - [Run Barque pipeline](step03_barque_pipeline.sh)
+4. **Post-Clustering Curation**  
+   - [Apply LULU](step06_lulu_barque.sh)
+   - [Apply microDecon](step06_microdecon_barque.sh)
+5. **Filtering & Taxonomic Assignment**  
+   - [Filter OTU table for target species](step07_filter_barque.md)
+6. **Downstream Analyses**  
+   - [Diversity metrics, PERMANOVA, PERMDISP](step08_downstream_analyses.md)
 
 ---
 
-## Author
+### 2. APSCALE Pipeline
 
-**Nicole Anthony**  
-GitHub: [@nanthony80](https://github.com/nanthony80)
+**Overview:**  
+CLI pipeline run with settings matched to Barque where possible.
+
+**Steps:**  
+1. **Data Download & Preparation**  
+   - [Download raw data and organize files](step01_data_download.md)
+2. **Reference Database Conversion**  
+   - [Convert database for APSCALE-BLAST](step02_reference_db.md)
+3. **APSCALE Analysis**  
+   - [Run APSCALE pipeline](step04_apscale_pipeline.sh)
+4. **Post-Clustering Curation**  
+   - [LULU integrated in APSCALE](step06_lulu_apscale.sh)
+   - [Apply microDecon](step06_microdecon_apscale.sh)
+5. **Taxonomic Assignment & Table Merging**  
+   - [APSCALE-BLAST assignment](step07_apscale_blast.md)
+   - [Merge tables with TaxonTableTools2](step07_taxontabletools2.md)
+6. **Filtering for Target Species**  
+   - [Filter ESV/OTU tables](step07_filter_apscale.md)
+7. **Downstream Analyses**  
+   - [Diversity metrics, PERMANOVA, PERMDISP](step08_downstream_analyses.md)
+
+---
+
+### 3. eDNA-Container App Pipeline
+
+**Overview:**  
+GUI pipeline run with settings matched to Barque where possible.
+
+**Steps:**  
+1. **Data Download & Preparation**  
+   - [Download raw data and organize files](step01_data_download.md)
+2. **Reference Database Conversion**  
+   - [Convert database for QIIME2 format](step02_reference_db.md)
+3. **eDNA-Container App Analysis**  
+   - [Run eDNA-Container App pipeline](step05_edna_container_app.md)
+4. **Post-Clustering Curation**  
+   - [Apply LULU](step06_lulu_edna_container.sh)
+   - [Apply microDecon](step06_microdecon_edna_container.sh)
+5. **Filtering & Taxonomic Assignment**  
+   - [Filter ASV table for target species](step07_filter_edna_container.md)
+6. **Downstream Analyses**  
+   - [Diversity metrics, PERMANOVA, PERMDISP](step08_downstream_analyses.md)
 
 ---
 
@@ -74,6 +137,7 @@ This project is for educational and research purposes. Original data belong to B
 - **Ballini, L., Staffoni, G., Nespoli, D., et al. (2025).** Environmental DNA metabarcoding as an efficient tool to monitor freshwater systems in northwestern Italy. *Hydrobiologia, 852,* 791–803. [https://doi.org/10.1007/s10750-024-05723-y](https://doi.org/10.1007/s10750-024-05723-y)
 - **Buchner, D., Macher, T. H., & Leese, F. (2022).** APSCALE: advanced pipeline for simple yet comprehensive analyses of DNA metabarcoding data. *Bioinformatics* 38(20), 4817–4819. [https://doi.org/10.1093/bioinformatics/btac588](https://doi.org/10.1093/bioinformatics/btac588)
 - **Frøslev, T. G., Kjøller, R., Bruun, H. H., Ejrnæs, R., Brunbjerg, A. K., Pietroni, C., & Hansen, A. J. (2017).** Algorithm for post-clustering curation of DNA amplicon data yields reliable biodiversity estimates. *Nature communications*, 8(1), 1188. https://doi.org/10.1038/s41467-017-01312-x
+- **Jeunen, G. J., Dowle, E., Edgecombe, J., von Ammon, U., Gemmell, N. J., & Cross, H. (2023).** crabs-A software program to generate curated reference databases for metabarcoding sequencing data. *Molecular ecology resources*, 23(3), 725–738. https://doi.org/10.1111/1755-0998.13741
 - **Mathon, L., Valentini, A., Guérin, P.-E., Normandeau, E., Noel, C., Lionnet, C., Boulanger, E., Thuiller, W., Bernatchez, L., Mouillot, D., Dejean, T., & Manel, S. (2021).** Benchmarking bioinformatic tools for fast and accurate eDNA metabarcoding species identification. *Molecular Ecology Resources, 21,* 2565–2579. [https://doi.org/10.1111/1755-0998.13430](https://doi.org/10.1111/1755-0998.13430)
 - **McKnight, D. T., Huerlimann, R., Bower, D. S., Schwarzkopf, L., Alford, R. A., & Zenger, K. R. (2019).** microDecon: A highly accurate read-subtraction tool for the post-sequencing removal of contamination in metabarcoding studies. *Environmental DNA, 1*(1), 14–25. [https://doi.org/10.1002/edn3.11](https://doi.org/10.1002/edn3.11)
 - **Riaz, T., Shehzad, W., Viari, A., Pompanon, F., Taberlet, P., & Coissac, E. (2011).** ecoPrimers: inference of new DNA barcode markers from whole genome sequence analysis. *Nucleic Acids Research, 39*(21), e145. [https://doi.org/10.1093/nar/gkr732](https://doi.org/10.1093/nar/gkr732)
