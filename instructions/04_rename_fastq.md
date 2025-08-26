@@ -71,6 +71,11 @@ Before running this script, make sure you have the following installed:
 
 ---
 
+## Next Step
+
+Open [`05_CRABS_ref_db.md`](05_CRABS_ref_db.md) and follow the instructions to create the vertebrate reference database using CRABS.
+
+---
 ## References
 
 Sample sequences from:
