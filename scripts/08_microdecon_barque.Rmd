@@ -1,0 +1,442 @@
+---
+title: "microdecon_barque"
+author: "Nicole Anthony"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# Introduction
+This analysis uses publicly available data from Ballini, L., Staffoni, G., Nespoli, D. et al. Environmental DNA metabarcoding as an efficient tool to monitor freshwater systems in northwestern Italy. Hydrobiologia (2024). eDNA metabarcoding sample sequences were initally processed using Barque v1.8.5 (https:// github. com/ enormandeau/ barque), an eDNA metabarcoding analysis pipeline that denoises and then annotates Amplicon Sequence Variants (ASVs) or Operational Taxonomic Units (OTUs) using high-quality reference databases. Following Barque, the LULU R package (v0.1.0, https://github.com/tobiasgf/lulu) was used to curate OTU tables by identifying and merging spurious OTUs that arise due to sequencing errors or minor variants of more abundant OTUs. LULU improves biodiversity metrics by reducing overestimation caused by such errors. This post-clustering curation approach is essential for producing more accurate and biologically meaningful results.
+
+## microDecon following LULU
+microDecon (v1.0.2, https://github.com/donaldtmcknight/microDecon) provides an easy method of identifying and removing contaminant reads post-sequencing. It uses the data in one or more blank samples that were carried throughout the entire project (collection, extraction, amplification, and sequencing) to identify and remove the reads in each actual sample that are from contamination. Because it removes reads rather than entire OTUs, it is a large improvement over existing methods.
+
+## References
+Ballini, L., Staffoni, G., Nespoli, D. et al. Environmental DNA metabarcoding as an efficient tool to monitor freshwater systems in northwestern Italy. Hydrobiologia 852, 791–803 (2025). https://doi.org/10.1007/s10750-024-05723-y
+
+Frøslev, T.G., Kjøller, R., Bruun, H.H. et al. Algorithm for post-clustering curation of DNA amplicon data yields reliable biodiversity estimates. Nat Commun 8, 1188 (2017). https://doi.org/10.1038/s41467-017-01312-x
+
+Mathon, L., Valentini, A., Guérin, P. E., Normandeau, E., Noel, C., Lionnet, C., Boulanger, E., Thuiller, W., Bernatchez, L., Mouillot, D., Dejean, T., & Manel, S. (2021). Benchmarking bioinformatic tools for fast and accurate eDNA metabarcoding species identification. Molecular ecology resources, 21(7), 2565–2579. https://doi.org/10.1111/1755-0998.13430
+
+McKnight, D. T., R. Huerlimann, D. S. Bower, L. Schwarzkopf, R. A. Alford, and K. R. Zenger. 2019. microDecon: A highly accurate read-subtraction tool for the post-sequencing removal of contamination in metabarcoding studies. Environmental DNA. https://doi.org/10.1002/edn3.11
+
+
+# Install package and load libraries
+```{r}
+# library(devtools)
+# devtools::install_github("donaldtmcknight/microDecon")
+library(microDecon)
+library(tibble)
+library(tidyverse)
+library(dplyr)
+```
+
+# Prepare OTU tables for microDecon format
+We converted our manually curated tables from LULU into the format requested by microDecon (1-3 below). Default options were applied.
+
+A properly formatted OTU table for microDecon should have:
+1. First column (OTU_ID) → Unique OTU identifiers.
+2. Next columns (Blank samples) → Negative controls (samples with expected contamination).
+3. Following columns (Real samples) → Actual biological/metabarcoding samples.
+4. Final column (Taxa, optional) → Taxonomic assignment (e.g., Kingdom, Phylum, etc.).
+
+## Load OTU tables from LULU
+```{r}
+# load OTU tables 
+tele02_microdecon <- read.csv("tele02_curated_otu_table_microdecon.csv", header = TRUE, check.names = FALSE)
+vert01_microdecon <- read.csv("vert01_curated_otu_table_microdecon.csv", header = TRUE, check.names = FALSE)
+
+# rename the first column to "OTU_ID" and coerce all sample columns to numeric
+tele02_microdecon <- tele02_microdecon %>%
+  rename(OTU_ID = 1) %>%
+  mutate(across(-OTU_ID, as.numeric))
+
+vert01_microdecon <- vert01_microdecon %>%
+  rename(OTU_ID = 1) %>%
+  mutate(across(-OTU_ID, as.numeric))
+
+# check for duplicated OTU IDs
+sum(duplicated(tele02_microdecon$OTU_ID))
+sum(duplicated(vert01_microdecon$OTU_ID))
+
+# check structure
+str(tele02_microdecon)
+head(tele02_microdecon)
+colnames(tele02_microdecon)
+str(vert01_microdecon)
+head(vert01_microdecon)
+colnames(vert01_microdecon)
+```
+
+
+# Run microDecon for Tele02 River Subsets
+
+```{r}
+# define sample information for all Tele02 rivers
+tele02_river_samples <- list(
+  ARGENTINA = list(
+    blank = c("SRR31057121.ARGENTINA.neg.Tele02",
+              "SRR31057075.NA.PCR"),
+    real = c("SRR31057115.ARGENTINA.r1.Tele02",
+             "SRR31057116.ARGENTINA.r2.Tele02",
+             "SRR31057117.ARGENTINA.r3.Tele02",
+             "SRR31057118.ARGENTINA.r4.Tele02",
+             "SRR31057119.ARGENTINA.r5.Tele02",
+             "SRR31057120.ARGENTINA.r6.Tele02")
+  ),
+  BEVERA = list(
+    blank = c("SRR31057090.BEVERA.neg.Tele02",
+              "SRR31057075.NA.PCR"),
+    real = c("SRR31057084.BEVERA.r1.Tele02",
+             "SRR31057085.BEVERA.r2.Tele02",
+             "SRR31057086.BEVERA.r3.Tele02",
+             "SRR31057087.BEVERA.r4.Tele02",
+             "SRR31057088.BEVERA.r5.Tele02",
+             "SRR31057089.BEVERA.r6.Tele02")
+  ),
+  CARPASINA = list(
+    blank = c("SRR31057098.CARPASINA.neg.Tele02",
+              "SRR31057075.NA.PCR"),
+    real = c("SRR31057091.CARPASINA.r1.Tele02",
+             "SRR31057093.CARPASINA.r2.Tele02",
+             "SRR31057094.CARPASINA.r3.Tele02",
+             "SRR31057095.CARPASINA.r4.Tele02",
+             "SRR31057096.CARPASINA.r5.Tele02",
+             "SRR31057097.CARPASINA.r6.Tele02")
+  ),
+  NERVIA = list(
+    blank = c("SRR31057083.NERVIA.neg.Tele02",
+              "SRR31057075.NA.PCR"),
+    real = c("SRR31057076.NERVIA.r1.Tele02",
+             "SRR31057077.NERVIA.r2.Tele02",
+             "SRR31057078.NERVIA.r3.Tele02",
+             "SRR31057079.NERVIA.r4.Tele02",
+             "SRR31057080.NERVIA.r5.Tele02",
+             "SRR31057082.NERVIA.r6.Tele02")
+  ),
+  ROIA = list(
+    blank = c("SRR31057113.ROIA.neg.Tele02",
+              "SRR31057075.NA.PCR"),
+    real = c("SRR31057107.ROIA.r1.Tele02",
+             "SRR31057108.ROIA.r2.Tele02",
+             "SRR31057109.ROIA.r3.Tele02",
+             "SRR31057110.ROIA.r4.Tele02",
+             "SRR31057111.ROIA.r5.Tele02",
+             "SRR31057112.ROIA.r6.Tele02")
+  ),
+  TANARO = list(
+    blank = c("SRR31057106.TANARO.neg.Tele02",
+              "SRR31057075.NA.PCR"),
+    real = c("SRR31057099.TANARO.r1.Tele02",
+             "SRR31057100.TANARO.r2.Tele02",
+             "SRR31057101.TANARO.r3.Tele02",
+             "SRR31057102.TANARO.r4.Tele02",
+             "SRR31057104.TANARO.r5.Tele02",
+             "SRR31057105.TANARO.r6.Tele02")
+  )
+)
+
+# function to check data quality and run microDecon
+process_river_microdecon <- function(data, river_name, blank_samples, real_samples, verbose = TRUE) {
+  
+  if (verbose) cat("\n=== Processing", river_name, "===\n")
+  
+  # subset data
+  river_data <- data %>%
+    select(OTU_ID, all_of(blank_samples), all_of(real_samples))
+  
+  if (verbose) {
+    cat("Data dimensions:", nrow(river_data), "x", ncol(river_data), "\n")
+    
+    # quality checks
+    num_check <- sapply(river_data[,-1], is.numeric)
+    cat("All numeric:", all(num_check), "\n")
+    cat("NA values:", sum(is.na(river_data)), "\n")
+    
+    # check for zero columns
+    zero_cols <- colSums(river_data[,-1]) == 0
+    cat("Columns with all zeros:", sum(zero_cols), "\n")
+    if (sum(zero_cols) > 0) {
+      cat("Zero columns:", names(zero_cols[zero_cols]), "\n")
+    }
+  }
+  
+  # check if blank sample is all zeros
+  blank_is_zero <- all(river_data[[blank_samples[1]]] == 0)
+  
+  if (blank_is_zero) {
+    if (verbose) cat("WARNING: Blank sample is all zeros. Skipping microDecon and returning real samples only.\n")
+    
+    # return only real samples (no decontamination possible)
+    result <- list(
+      decon.table = river_data %>% select(OTU_ID, all_of(real_samples))
+    )
+  } else {
+    if (verbose) cat("Running microDecon...\n")
+    
+    # run microDecon
+    result <- decon(
+      data = river_data,
+      numb.blanks = 2,
+      numb.ind = length(real_samples),
+      taxa = FALSE
+    )
+  }
+  
+  if (verbose) {
+    cat("Output dimensions:", nrow(result$decon.table), "x", ncol(result$decon.table), "\n")
+  }
+  
+  return(result)
+}
+
+# process all rivers
+tele02_cleaned_results <- list()
+
+for (river in names(tele02_river_samples)) {
+  tele02_cleaned_results[[river]] <- process_river_microdecon(
+    data = tele02_microdecon,
+    river_name = river,
+    blank_samples = tele02_river_samples[[river]]$blank,
+    real_samples = tele02_river_samples[[river]]$real,
+    verbose = TRUE
+  )
+}
+
+# access individual river results
+tele02_argentina_cleaned <- tele02_cleaned_results$ARGENTINA
+tele02_bevera_cleaned <- tele02_cleaned_results$BEVERA
+tele02_carpasina_cleaned <- tele02_cleaned_results$CARPASINA
+tele02_nervia_cleaned <- tele02_cleaned_results$NERVIA
+tele02_roia_cleaned <- tele02_cleaned_results$ROIA
+tele02_tanaro_cleaned <- tele02_cleaned_results$TANARO
+
+# summary of all results
+cat("\n=== TELE02 SUMMARY ===\n")
+for (river in names(tele02_cleaned_results)) {
+  result <- tele02_cleaned_results[[river]]
+  cat(sprintf("%s: %d OTUs x %d samples\n", 
+              river, 
+              nrow(result$decon.table), 
+              ncol(result$decon.table) - 1))  # -1 for OTU_ID column
+}
+```
+
+
+# Run microDecon for Vert01 River Subsets
+
+```{r}
+# define sample information for all Vert01 rivers
+vert01_river_samples <- list(
+  ARGENTINA = list(
+    blank = c("SRR31057159.ARGENTINA.neg.Vert01",
+              "SRR31057123.NA.PCR"),
+    real = c("SRR31057103.ARGENTINA.r1.Vert01",
+             "SRR31057114.ARGENTINA.r2.Vert01",
+             "SRR31057125.ARGENTINA.r3.Vert01",
+             "SRR31057136.ARGENTINA.r4.Vert01",
+             "SRR31057147.ARGENTINA.r5.Vert01",
+             "SRR31057158.ARGENTINA.r6.Vert01")
+  ),
+  BEVERA = list(
+    blank = c("SRR31057139.BEVERA.neg.Vert01",
+              "SRR31057123.NA.PCR"),
+    real = c("SRR31057132.BEVERA.r1.Vert01",
+             "SRR31057133.BEVERA.r2.Vert01",
+             "SRR31057134.BEVERA.r3.Vert01",
+             "SRR31057135.BEVERA.r4.Vert01",
+             "SRR31057137.BEVERA.r5.Vert01",
+             "SRR31057138.BEVERA.r6.Vert01")
+  ),
+  CARPASINA = list(
+    blank = c("SRR31057146.CARPASINA.neg.Vert01",
+              "SRR31057123.NA.PCR"),
+    real = c("SRR31057140.CARPASINA.r1.Vert01",
+             "SRR31057141.CARPASINA.r2.Vert01",
+             "SRR31057142.CARPASINA.r3.Vert01",
+             "SRR31057143.CARPASINA.r4.Vert01",
+             "SRR31057144.CARPASINA.r5.Vert01",
+             "SRR31057145.CARPASINA.r6.Vert01")
+  ),
+  NERVIA = list(
+    blank = c("SRR31057131.NERVIA.neg.Vert01",
+              "SRR31057123.NA.PCR"),
+    real = c("SRR31057124.NERVIA.r1.Vert01",
+             "SRR31057126.NERVIA.r2.Vert01",
+             "SRR31057127.NERVIA.r3.Vert01",
+             "SRR31057128.NERVIA.r4.Vert01",
+             "SRR31057129.NERVIA.r5.Vert01",
+             "SRR31057130.NERVIA.r6.Vert01")
+  ),
+  ROIA = list(
+    blank = c("SRR31057092.ROIA.neg.Vert01",
+              "SRR31057123.NA.PCR"),
+    real = c("SRR31057072.ROIA.r4.Vert01",
+             "SRR31057073.ROIA.r5.Vert01",
+             "SRR31057081.ROIA.r6.Vert01",
+             "SRR31057155.ROIA.r1.Vert01",
+             "SRR31057156.ROIA.r2.Vert01",
+             "SRR31057157.ROIA.r3.Vert01")
+  ),
+  TANARO = list(
+    blank = c("SRR31057154.TANARO.neg.Vert01",
+              "SRR31057123.NA.PCR"),
+    real = c("SRR31057148.TANARO.r1.Vert01",
+             "SRR31057149.TANARO.r2.Vert01",
+             "SRR31057150.TANARO.r3.Vert01",
+             "SRR31057151.TANARO.r4.Vert01",
+             "SRR31057152.TANARO.r5.Vert01",
+             "SRR31057153.TANARO.r6.Vert01")
+  )
+)
+
+# function to check data quality and run microDecon
+process_river_microdecon <- function(data, river_name, blank_samples, real_samples, verbose = TRUE) {
+  
+  if (verbose) cat("\n=== Processing", river_name, "- Vert01 ===\n")
+  
+  # subset data
+  river_data <- data %>%
+    select(OTU_ID, all_of(blank_samples), all_of(real_samples))
+  
+  if (verbose) {
+    cat("Data dimensions:", nrow(river_data), "x", ncol(river_data), "\n")
+    
+    # quality checks
+    num_check <- sapply(river_data[,-1], is.numeric)
+    cat("All numeric:", all(num_check), "\n")
+    cat("NA values:", sum(is.na(river_data)), "\n")
+    
+    # check for zero columns
+    zero_cols <- colSums(river_data[,-1]) == 0
+    cat("Columns with all zeros:", sum(zero_cols), "\n")
+    if (sum(zero_cols) > 0) {
+      cat("Zero columns:", names(zero_cols[zero_cols]), "\n")
+    }
+  }
+  
+  # check if blank sample is all zeros
+  blank_is_zero <- all(river_data[[blank_samples[1]]] == 0)
+  
+  if (blank_is_zero) {
+    if (verbose) cat("WARNING: Blank sample is all zeros. Skipping microDecon and returning real samples only.\n")
+    
+    # return only real samples (no decontamination possible)
+    result <- list(
+      decon.table = river_data %>% select(OTU_ID, all_of(real_samples))
+    )
+  } else {
+    if (verbose) cat("Running microDecon...\n")
+    
+    # run microDecon
+    result <- decon(
+      data = river_data,
+      numb.blanks = 2,
+      numb.ind = length(real_samples),
+      taxa = FALSE
+    )
+  }
+  
+  if (verbose) {
+    cat("Output dimensions:", nrow(result$decon.table), "x", ncol(result$decon.table), "\n")
+  }
+  
+  return(result)
+}
+
+# process all Vert01 rivers
+vert01_cleaned_results <- list()
+
+for (river in names(vert01_river_samples)) {
+  vert01_cleaned_results[[river]] <- process_river_microdecon(
+    data = vert01_microdecon,
+    river_name = river,
+    blank_samples = vert01_river_samples[[river]]$blank,
+    real_samples = vert01_river_samples[[river]]$real,
+    verbose = TRUE
+  )
+}
+
+# access individual river results
+vert01_argentina_cleaned <- vert01_cleaned_results$ARGENTINA
+vert01_bevera_cleaned <- vert01_cleaned_results$BEVERA
+vert01_carpasina_cleaned <- vert01_cleaned_results$CARPASINA
+vert01_nervia_cleaned <- vert01_cleaned_results$NERVIA
+vert01_roia_cleaned <- vert01_cleaned_results$ROIA
+vert01_tanaro_cleaned <- vert01_cleaned_results$TANARO
+
+# summary of all Vert01 results
+cat("\n=== VERT01 SUMMARY ===\n")
+for (river in names(vert01_cleaned_results)) {
+  result <- vert01_cleaned_results[[river]]
+  cat(sprintf("%s: %d OTUs x %d samples\n", 
+              river, 
+              nrow(result$decon.table), 
+              ncol(result$decon.table) - 1))  # -1 for OTU_ID column
+}
+```
+
+
+# Final Taxon Lists by River (individual samples) and Marker
+```{r}
+# function to save cleaned results for a marker
+save_marker_results <- function(results_list, marker_name) {
+  for (river in names(results_list)) {
+    filename <- paste0(tolower(marker_name), "_", tolower(river), "_cleaned.csv")
+    write.csv(results_list[[river]]$decon.table, filename, row.names = FALSE)
+    cat("Saved:", filename, "\n")
+  }
+}
+
+# aave all results
+save_marker_results(tele02_cleaned_results, "Tele02")
+save_marker_results(vert01_cleaned_results, "Vert01")
+```
+
+
+
+# Final Taxon Lists by Marker
+```{r}
+# function to process marker results into summed output
+process_marker_output <- function(results_list, marker_name) {
+  
+  cat("Processing", marker_name, "results...\n")
+  
+  # process all rivers at once using map and reduce
+  river_data <- map(names(results_list), function(river) {
+    df <- results_list[[river]]$decon.table
+    
+    # sum reads across all sample columns (excluding OTU_ID)
+    df_summed <- df %>%
+      mutate(!!tolower(river) := rowSums(select(., -OTU_ID))) %>%
+      select(OTU_ID, !!tolower(river))
+    
+    return(df_summed)
+  })
+  
+  # combine all rivers with full joins
+  output <- reduce(river_data, full_join, by = "OTU_ID")
+  
+  cat("Completed", marker_name, "with", nrow(output), "OTUs across", 
+      ncol(output)-1, "rivers\n")
+  
+  return(output)
+}
+
+# process both markers
+tele02_microdecon_output <- process_marker_output(tele02_cleaned_results, "Tele02")
+vert01_microdecon_output <- process_marker_output(vert01_cleaned_results, "Vert01")
+
+# check results
+head(tele02_microdecon_output)
+head(vert01_microdecon_output)
+
+# save files
+write.csv(tele02_microdecon_output, "tele02_microdecon_output.csv", row.names = FALSE)
+write.csv(vert01_microdecon_output, "vert01_microdecon_output.csv", row.names = FALSE)
+
+cat("Files saved successfully!\n")
+```
+
+
+
