@@ -2,11 +2,11 @@
 
 ## Introduction
 
-### Reproducibility and pipeline comparison using eDNA metabarcoding data from Italian freshwater rivers from Ballini et al., 2024.
+### Reproducibility and pipeline comparison using eDNA metabarcoding data from Italian freshwater rivers from Ballini et al. (2024).
 
-repliSTREAM is a project aimed at reproducing and extending the environmental DNA (eDNA) metabarcoding analysis of Ballini et al., 2024, with emphasis on freshwater fish biodiversity. Although the original study also reported amphibians, birds, and mammals from its multi-marker approach, this project limits its scope to fish taxa as a learning exercise in replicating the core biodiversity results of the original study.
+repliSTREAM is a project aimed at reproducing and extending the environmental DNA (eDNA) metabarcoding analysis of Ballini et al. (2024), with emphasis on freshwater fish biodiversity. Although the original study also reported amphibians, birds, and mammals from its multi-marker approach, this project limits its scope to fish taxa as a learning exercise in replicating the core biodiversity results of the original study.
 
-Using the publicly available dataset of eDNA samples from six rivers in northwestern Italy, amplified with two 12S rRNA markers (Tele02: Taberlet et al., 2018; Vert01: Riaz et al., 2011), repliSTREAM evaluates the reproducibility of the Barque (Mathon et al. 2021) command-line interface (CLI) pipeline and compares it with two alternatives: APSCALE-CLI (Buchner et al., 2022) and the GUI-based eDNA-Container App (Wheeler et al., 2024). Vertebrate reference database creation was performed using Creating Reference databases for Amplicon-Based Sequencing (CRABS) (Jeunen et al., 2023). Post-clustering curation and decontamination steps were performed with LULU (Frøslev et al., 2017) and microDecon (McKnight et al., 2019) to ensure error reduction and contamination control across pipelines. All scripts, instructions, and results are provided to enable full replication, cross-pipeline comparison, and visualization of fish community outputs, supporting transparent and reproducible research in eDNA metabarcoding.
+Using the publicly available dataset of eDNA samples from six rivers in northwestern Italy, amplified with two 12S rRNA markers (Tele02: Taberlet et al., 2018; Vert01: Riaz et al., 2011), repliSTREAM evaluates the reproducibility of the Barque (Mathon et al., 2021) command-line interface (CLI) pipeline and compares it with two alternatives: APSCALE-CLI (Buchner et al., 2022) and the GUI-based eDNA-Container App (Wheeler et al., 2024). Vertebrate reference database creation was performed using Creating Reference databases for Amplicon-Based Sequencing (CRABS) (Jeunen et al., 2023). Post-clustering curation and decontamination steps were performed with LULU (Frøslev et al., 2017) and microDecon (McKnight et al., 2019) to ensure error reduction and contamination control across pipelines. All scripts, instructions, and results are provided to enable full replication, cross-pipeline comparison, and visualization of fish community outputs, supporting transparent and reproducible research in eDNA metabarcoding.
 
 This project is part of my personal learning journey in eDNA metabarcoding bioinformatics. I am not a professional researcher or bioinformatician, so errors or oversights may be present. Feedback and suggestions are welcome to help improve it.
 
@@ -37,7 +37,7 @@ This project is part of my personal learning journey in eDNA metabarcoding bioin
 
 ## Notes
 
-- Raw, demiltiplexed, paired-end Illumina data were obtained from [Ballini et al., 2024](https://doi.org/10.1007/s10750-024-05723-y) and replication of the Barque>LULU>microDecon pipeline followed the original GitHub by [@giorgiastaffoni](https://github.com/giorgiastaffoni/STREAM) with some modifications.
+- Raw, demiltiplexed, paired-end Illumina data were obtained from [Ballini et al. (2024)](https://doi.org/10.1007/s10750-024-05723-y) and replication of the Barque>LULU>microDecon pipeline followed the original GitHub by [@giorgiastaffoni](https://github.com/giorgiastaffoni/STREAM) with some modifications.
 - APSCALE and eDNA-Container App pipelines were configured with settings as similar as possible to Barque; any differences are noted in the relevant sections.
 - For documentation and installation instructions, see:  
   - **Reference Database Creation**: [CRABS](https://github.com/gjeunen/reference_database_creator)  
@@ -51,7 +51,7 @@ This project is part of my personal learning journey in eDNA metabarcoding bioin
 ### 1. Barque Pipeline
 
 **Overview:**  
-Replication of Barque > LULU > microDecon pipeline as used in Ballini et al., 2024, with modifications. Below are instructions with additional notes. Scripts available in the `scripts` folder of this repository.
+Replication of Barque > LULU > microDecon pipeline as used in Ballini et al. (2024), with modifications. Below are instructions with additional notes. Scripts available in the `scripts` folder of this repository.
 
 **Steps:**  
 1. **Data Download & Preparation**  
@@ -124,13 +124,13 @@ Filter species tables and run diversity metrics, PERMANOVA and PERMDISP
 **Daniel Stratis**  
 GitHub: [@dswede43](https://github.com/dswede43)
 
-I am grateful to my project partner, Daniel Stratis, for his collaboration throughout this work, including identifying Ballini et al., 2024 as a suitable study for learning eDNA metabarcoding bioinformatics, supporting the curation of the CRABS reference database, advising on pipeline troubleshooting and analyses, and providing consistent feedback and encouragement along the way. His contributions were instrumental to the progress of this project and to my own learning journey.
+I am grateful to my project partner, Daniel Stratis, for his collaboration throughout this work, including identifying Ballini et al. (2024) as a suitable study for learning eDNA metabarcoding bioinformatics, supporting the curation of the CRABS reference database, advising on pipeline troubleshooting and analyses, and providing consistent feedback and encouragement along the way. His contributions were instrumental to the progress of this project and to my own learning journey.
 
 ---
 
 ## License
  
-This project is for educational and research purposes. Original data belong to Ballini et al., 2024.
+This project is for educational and research purposes. Original data belong to Ballini et al. (2024).
 
 ---
 
