@@ -124,7 +124,7 @@ Filter species tables and run diversity metrics, PERMANOVA and PERMDISP
 **Daniel Stratis**  
 GitHub: [@dswede43](https://github.com/dswede43)
 
-I am grateful to my project partner, Daniel Stratis, for his collaboration throughout this work, including identifying Ballini et al. (2024) as a suitable study for learning eDNA metabarcoding bioinformatics, supporting the curation of the CRABS reference database, advising on pipeline troubleshooting and analyses, and providing consistent feedback and encouragement along the way. His contributions were instrumental to the progress of this project and to my own learning journey.
+I am grateful to my project partner, Daniel Stratis, for his collaboration throughout this work, including identifying Ballini et al., 2024 as a suitable study for learning eDNA metabarcoding bioinformatics, supporting the curation of the CRABS reference database, advising on pipeline troubleshooting and analyses, and providing consistent feedback and encouragement along the way. His contributions were instrumental to the progress of this project and to my own learning journey.
 
 ---
 
