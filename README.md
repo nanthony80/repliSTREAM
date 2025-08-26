@@ -29,15 +29,15 @@ This project is part of my personal learning journey in eDNA metabarcoding bioin
 ---
 ## Bioinformatics Workflow
 
-<img width="718" height="500" alt="Screenshot 2025-08-24 at 4 10 05 PM" src="https://github.com/user-attachments/assets/81c89f8e-6679-4638-8b9f-10805e8d2a06" />
+<img width="670" height="467" alt="bioinformatics_workflow" src="https://github.com/user-attachments/assets/84e7db44-1a45-40d0-9b4c-3a89cc79ea32" />
 
-*Figure 1. Overview of the repliSTREAM workflow comparing Barque, APSCALE, and eDNA-Container App pipelines (created with BioRender.com).*
+*Figure 1. Overview of the repliSTREAM workflow comparing Barque, APSCALE, and eDNA-Container App pipelines [created in BioRender.com](https://BioRender.com).*
 
 ---
 
 ## Notes
 
-- Raw, demiltiplexed, paired-end Illumina data were obtained from [Ballini et al. (2024)](https://doi.org/10.1007/s10750-024-05723-y) and replication of the Barque>LULU>microDecon pipeline followed the original GitHub by [@giorgiastaffoni](https://github.com/giorgiastaffoni/STREAM) with some modifications.
+- Raw, demiltiplexed, paired-end Illumina data were obtained from [Ballini et al., 2024](https://doi.org/10.1007/s10750-024-05723-y) and replication of the Barque>LULU>microDecon pipeline followed the original GitHub by [@giorgiastaffoni](https://github.com/giorgiastaffoni/STREAM) with some modifications.
 - APSCALE and eDNA-Container App pipelines were configured with settings as similar as possible to Barque; any differences are noted in the relevant sections.
 - For documentation and installation instructions, see:  
   - **Reference Database Creation**: [CRABS](https://github.com/gjeunen/reference_database_creator)  
@@ -51,7 +51,7 @@ This project is part of my personal learning journey in eDNA metabarcoding bioin
 ### 1. Barque Pipeline
 
 **Overview:**  
-Replication of Barque > LULU > microDecon pipeline as used in Ballini et al. (2024), with modifications. Below are instructions with additional notes. Scripts available in the `scripts` folder of this repository.
+Replication of Barque > LULU > microDecon pipeline as used in Ballini et al., 2024, with modifications. Below are instructions with additional notes. Scripts available in the `scripts` folder of this repository.
 
 **Steps:**  
 1. **Data Download & Preparation**  
@@ -130,7 +130,7 @@ I am grateful to my project partner, Daniel Stratis, for his collaboration throu
 
 ## License
  
-This project is for educational and research purposes. Original data belong to Ballini et al. (2024).
+This project is for educational and research purposes. Original data belong to Ballini et al., 2024.
 
 ---
 
