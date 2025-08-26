@@ -56,16 +56,16 @@ Replication of Barque > LULU > microDecon pipeline as used in Ballini et al. (20
 **Steps:**  
 1. **Data Download & Preparation**  
    - [Download sample files from the Sequence Read Archive (SRA)](instructions/01_fastq_download.md)
-   - [Convert `.sra` files to paired-end `.fastq` files](02_convert_fastq.md)
-   - [Run samples through quality control](03_qc_fastqc_multiqc.md)
-   - [Rename sample files to Barque compatible format](04_rename_fastq.md)
+   - [Convert `.sra` files to paired-end `.fastq` files](instructions/02_convert_fastq.md)
+   - [Run samples through quality control](instructions/03_qc_fastqc_multiqc.md)
+   - [Rename sample files to Barque compatible format](instructions/04_rename_fastq.md)
 2. **Reference Database Creation**  
-   - [CRABS curation for 12S rRNA vertebrate reference database](05_CRABS_ref_db.md)
+   - [CRABS curation for 12S rRNA vertebrate reference database](instructions/05_CRABS_ref_db.md)
 3. **Barque Analysis**  
-   - [Setup and run Barque pipeline](07_barque.md)
+   - [Setup and run Barque pipeline](instructions/06_barque.md)
 4. **Post-Clustering Curation and Decontamination**  
-   - [Apply LULU](08_lulu.md)
-   - [Apply microDecon](09_microdecon.md)
+   - [Apply LULU](scripts/07_lulu_barque.Rmd)
+   - [Apply microDecon](scripts/08_microdecon_barque.Rmd)
 
 ---
 
