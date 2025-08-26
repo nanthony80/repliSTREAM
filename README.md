@@ -55,7 +55,7 @@ Replication of Barque > LULU > microDecon pipeline as used in Ballini et al. (20
 
 **Steps:**  
 1. **Data Download & Preparation**  
-   - [Download sample files from the Sequence Read Archive (SRA)](01_fastq_download.md)
+   - [Download sample files from the Sequence Read Archive (SRA)](instructions/01_fastq_download.md)
    - [Convert `.sra` files to paired-end `.fastq` files](02_convert_fastq.md)
    - [Run samples through quality control](03_qc_fastqc_multiqc.md)
    - [Rename sample files to Barque compatible format](04_rename_fastq.md)
