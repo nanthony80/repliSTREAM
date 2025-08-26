@@ -51,22 +51,21 @@ This project is part of my personal learning journey in eDNA metabarcoding bioin
 ### 1. Barque Pipeline
 
 **Overview:**  
-Replication of Barque > LULU > microDecon pipeline as used in Ballini et al. (2024), with modifications.
+Replication of Barque > LULU > microDecon pipeline as used in Ballini et al. (2024), with modifications. Below are instructions with additional notes. Scripts available in the `scripts` folder of this repository.
 
 **Steps:**  
 1. **Data Download & Preparation**  
-   - [Download raw data and organize files](step01_data_download.md)
+   - [Download sample files from the Sequence Read Archive (SRA)](01_fastq_download.md)
+   - [Convert `.sra` files to paired-end `.fastq` files](02_convert_fastq.md)
+   - [Run samples through quality control](03_qc_fastqc_multiqc.md)
+   - [Rename sample files to Barque compatible format](04_rename_fastq.md)
 2. **Reference Database Creation**  
-   - [CRABS curation for 12S rRNA fish reference](step02_reference_db.md)
+   - [CRABS curation for 12S rRNA vertebrate reference database](05_CRABS_ref_db.md)
 3. **Barque Analysis**  
-   - [Run Barque pipeline](step03_barque_pipeline.sh)
-4. **Post-Clustering Curation**  
-   - [Apply LULU](step06_lulu_barque.sh)
-   - [Apply microDecon](step06_microdecon_barque.sh)
-5. **Filtering & Taxonomic Assignment**  
-   - [Filter OTU table for target species](step07_filter_barque.md)
-6. **Downstream Analyses**  
-   - [Diversity metrics, PERMANOVA, PERMDISP](step08_downstream_analyses.md)
+   - [Setup and run Barque pipeline](07_barque.md)
+4. **Post-Clustering Curation and Decontamination**  
+   - [Apply LULU](08_lulu.md)
+   - [Apply microDecon](09_microdecon.md)
 
 ---
 
@@ -76,22 +75,18 @@ Replication of Barque > LULU > microDecon pipeline as used in Ballini et al. (20
 CLI pipeline run with settings matched to Barque where possible.
 
 **Steps:**  
-1. **Data Download & Preparation**  
-   - [Download raw data and organize files](step01_data_download.md)
-2. **Reference Database Conversion**  
+1. **Reference Database Conversion**  
    - [Convert database for APSCALE-BLAST](step02_reference_db.md)
-3. **APSCALE Analysis**  
+2. **APSCALE Analysis**  
    - [Run APSCALE pipeline](step04_apscale_pipeline.sh)
-4. **Post-Clustering Curation**  
-   - [LULU integrated in APSCALE](step06_lulu_apscale.sh)
-   - [Apply microDecon](step06_microdecon_apscale.sh)
-5. **Taxonomic Assignment & Table Merging**  
+2. **Reference Database Conversion**  
+   - [Convert CRABS database to APSCALE-BLAST compatible format](step04_apscale_pipeline.sh)
+3. **Taxonomic Assignment & Table Merging**  
    - [APSCALE-BLAST assignment](step07_apscale_blast.md)
    - [Merge tables with TaxonTableTools2](step07_taxontabletools2.md)
-6. **Filtering for Target Species**  
-   - [Filter ESV/OTU tables](step07_filter_apscale.md)
-7. **Downstream Analyses**  
-   - [Diversity metrics, PERMANOVA, PERMDISP](step08_downstream_analyses.md)
+4. **Decontamination**
+   Note: LULU is integrated in APSCALE.
+   - [Apply microDecon](step06_microdecon_apscale.sh)
 
 ---
 
@@ -101,18 +96,27 @@ CLI pipeline run with settings matched to Barque where possible.
 GUI pipeline run with settings matched to Barque where possible.
 
 **Steps:**  
-1. **Data Download & Preparation**  
-   - [Download raw data and organize files](step01_data_download.md)
+1. **Data Preparation**  
+   - [Rename sample files to eDNA-Container App-compatible format]](step01_data_download.md)
 2. **Reference Database Conversion**  
-   - [Convert database for QIIME2 format](step02_reference_db.md)
+   - [Convert CRABS database to QIIME2 format](step02_reference_db.md)
 3. **eDNA-Container App Analysis**  
    - [Run eDNA-Container App pipeline](step05_edna_container_app.md)
-4. **Post-Clustering Curation**  
+4. **Post-Clustering Curation and Decontamination**  
    - [Apply LULU](step06_lulu_edna_container.sh)
    - [Apply microDecon](step06_microdecon_edna_container.sh)
-5. **Filtering & Taxonomic Assignment**  
+  
+---
+
+### 4. Downstream Analyses & Results
+
+**Overview:**  
+Filter species tables and run diversity metrics, PERMANOVA and PERMDISP
+
+**Steps:**
+1. **Filtering Species Tables**  
    - [Filter ASV table for target species](step07_filter_edna_container.md)
-6. **Downstream Analyses**  
+2. **Downstream Analyses**  
    - [Diversity metrics, PERMANOVA, PERMDISP](step08_downstream_analyses.md)
 
 ---
