@@ -145,6 +145,13 @@ Post-hoc filtering was only applied after taxonomic assignment, retaining specie
 
 ---
 
+## Next Steps
+
+Open [`07_lulu_barque.Rmd`](07_lulu_barque.Rmd) and run the script to perform LULU filtering for error reduction.
+Open [`08_microdecon_barque.Rmd`](08_microdecon_barque.Rmd) and run the script to perform decontamination with microDecon.
+
+---
+
 ## References
 
 - [Barque GitHub repository](https://github.com/enormandeau/barque)
