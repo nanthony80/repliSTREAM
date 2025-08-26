@@ -75,10 +75,10 @@ Replication of Barque > LULU > microDecon pipeline as used in Ballini et al. (20
 CLI pipeline run with settings matched to Barque where possible.
 
 **Steps:**  
-1. **APSCALE Analysis**  
-   - [Run APSCALE pipeline](step04_apscale_pipeline.sh)
-2. **Reference Database Conversion**  
-   - [Convert CRABS database to APSCALE-BLAST compatible format](step04_apscale_pipeline.sh)
+1. **Reference Database Conversion**  
+   - [Convert CRABS database to APSCALE-BLAST compatible format](instructions/09_CRABS_to_APSCALE.md)
+2. **APSCALE Analysis**  
+   - [Run APSCALE pipeline](instructions/10_apscale.md)
 3. **Taxonomic Assignment & Table Merging**  
    - [APSCALE-BLAST assignment](step07_apscale_blast.md)
    - [Merge tables with TaxonTableTools2](step07_taxontabletools2.md)
