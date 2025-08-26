@@ -5,7 +5,7 @@ All commands are run via `scripts/02_convert_fastq.sh`.
 
 ---
 
-## Step 2: Convert SRA to FASTQ
+## Convert SRA to FASTQ
 
 The conversion script will:
 - Recursively find all `.sra` files in `data/raw_reads/` (including subfolders)
