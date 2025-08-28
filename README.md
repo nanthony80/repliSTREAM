@@ -63,7 +63,9 @@ Replication of Barque > LULU > microDecon pipeline as used in Ballini et al. (20
    - [CRABS curation for 12S rRNA vertebrate reference database](instructions/05_CRABS_ref_db.md)
 3. **Barque Analysis**  
    - [Setup and run Barque pipeline](instructions/06_barque.md)
-4. **Post-Clustering Curation and Decontamination**  
+4. **Handling MultiHit OTUs**  
+   - [MultiHit OTU Reassignment (Barque, vert01 marker only)](notes/multihits_and_nontarget_species.md)
+5. **Post-Clustering Curation and Decontamination**  
    - [Apply LULU](scripts/07_lulu_barque.Rmd)
    - [Apply microDecon](scripts/08_microdecon_barque.Rmd)
 
@@ -80,11 +82,11 @@ CLI pipeline run with settings matched to Barque where possible.
 2. **APSCALE Analysis**  
    - [Run APSCALE pipeline](instructions/10_apscale.md)
 3. **Taxonomic Assignment & Table Merging**  
-   - [APSCALE-BLAST assignment](step07_apscale_blast.md)
-   - [Merge tables with TaxonTableTools2](step07_taxontabletools2.md)
+   - [APSCALE-BLAST assignment](instructions/11_apscale_blast.md)
+   - [Merge tables with TaxonTableTools2](instructions/12_ttt2.md)
 4. **Decontamination**
    Note: LULU is integrated in APSCALE.
-   - [Apply microDecon](step06_microdecon_apscale.sh)
+   - [Apply microDecon](scripts/13_microdecon_apscale.Rmd)
 
 ---
 
@@ -95,14 +97,14 @@ GUI pipeline run with settings matched to Barque where possible.
 
 **Steps:**  
 1. **Data Preparation**  
-   - [Rename sample files to eDNA-Container App-compatible format]](step01_data_download.md)
+   - [Rename sample files to eDNA-Container App-compatible format]](instructions/14_copy_rename_fastq.md)
 2. **Reference Database Conversion**  
-   - [Convert CRABS database to QIIME2 format](step02_reference_db.md)
+   - [Convert CRABS database to QIIME2 format](instructions/15_CRABS_to_QIIME2.md)
 3. **eDNA-Container App Analysis**  
-   - [Run eDNA-Container App pipeline](step05_edna_container_app.md)
+   - [Run eDNA-Container App pipeline](instructions./16_edna_container_app)
 4. **Post-Clustering Curation and Decontamination**  
-   - [Apply LULU](step06_lulu_edna_container.sh)
-   - [Apply microDecon](step06_microdecon_edna_container.sh)
+   - [Apply LULU](scripts/16_lulu_edna_container_app.Rmd)
+   - [Apply microDecon](scripts/17_microdecon_edna_container_app.Rmd)
   
 ---
 
@@ -113,7 +115,7 @@ Filter species tables and run diversity metrics, PERMANOVA and PERMDISP
 
 **Steps:**
 1. **Filtering Species Tables**  
-   - [Filter ASV table for target species](step07_filter_edna_container.md)
+   - [Filter species tables for target species](notes/multihits_and_nontarget_species.md)
 2. **Downstream Analyses**  
    - [Diversity metrics, PERMANOVA, PERMDISP](step08_downstream_analyses.md)
 
