@@ -1,0 +1,409 @@
+---
+title: "lulu_edna_container_app"
+author: "Nicole Anthony"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# Introduction
+This analysis applies the LULU algorithm to eDNA metabarcoding data processed with the eDNA Container App, using publicly available datasets from Ballini et al. (2024). A curated reference database was created with Creating Reference Databases for Amplicon-Based Sequencing (CRABS), following the approach described in Ballini et al. (2024) but with some modifications. See the repliSTREAM README.md for details on Barque settings and CRABS adjustments. The resulting database was converted to a QIIME2-compatible format and used in the eDNA Container App to generate amplicon sequence variant (ASV) tables, which served as input to LULU.
+
+## Post-Clustering Curation of OTU Data Using LULU
+This analysis uses the LULU R package (v0.1.0, https://github.com/tobiasgf/lulu) for post-clustering curation of OTU tables. LULU identifies OTUs that are likely sequencing artefacts or minor variants of more abundant OTUs and merges them with their parent OTUs. This reduces inflated diversity estimates and produces more accurate biodiversity metrics.
+
+LULU applies two criteria when flagging OTUs for merging:  
+1. **Sequence similarity** – the candidate OTU shares high sequence identity with a more abundant OTU.  
+2. **Co-occurrence patterns** – the candidate OTU consistently occurs in the same samples as the more abundant OTU.
+
+OTUs meeting both criteria are considered spurious and are merged with the dominant OTU.
+
+### Set-up for LULU
+Copy the following files from the eDNA Container App output (`/final_results/asvs`) into a new directory called `lulu/`:
+
+- `asv_count_tax_seqs.csv` for each marker (renamed to `tele02_asv_count_tax_seqs.csv` and `vert01_asv_count_tax_seqs.csv`)
+- `dna-sequences.fasta` for each marker (renamed to `tele02_dna-sequences.fasta` and `vert01_dna-sequences.fasta`)
+
+### Output for microDecon
+After running LULU, the curated OTU tables were used as input for contamination removal with microDecon (v1.0.2) in the `18_microdecon_edna_container_app.Rmd` workflow:
+
+- `tele02_curated_otu_table_aggregated_microdecon.csv`
+- `vert01_curated_otu_table_aggregated_microdecon.csv`
+
+These tables include environmental and negative control (blank) samples, enabling microDecon to identify and remove potential contaminants using its default settings.
+
+## References
+
+Ballini, L., Staffoni, G., Nespoli, D. et al. Environmental DNA metabarcoding as an efficient tool to monitor freshwater systems in northwestern Italy. Hydrobiologia 852, 791–803 (2025). https://doi.org/10.1007/s10750-024-05723-y
+
+Frøslev, T.G., Kjøller, R., Bruun, H.H. et al. Algorithm for post-clustering curation of DNA amplicon data yields reliable biodiversity estimates. Nat Commun 8, 1188 (2017). https://doi.org/10.1038/s41467-017-01312-x
+
+Jeunen, G. J., Dowle, E., Edgecombe, J., von Ammon, U., Gemmell, N. J., & Cross, H. (2023). crabs-A software program to generate curated reference databases for metabarcoding sequencing data. Molecular ecology resources, 23(3), 725–738. https://doi.org/10.1111/1755-0998.13741
+
+
+Wheeler, D., Brancalion, L., Kawasaki, A., & Rourke, M. L. (2024). The eDNA-Container App: A Simple-to-Use Cross-Platform Package for the Reproducible Analysis of eDNA Sequencing Data. Applied Sciences, 14(6), 2641. https://doi.org/10.3390/app14062641
+
+
+
+# Install package and load libraries
+```{r}
+# library(devtools)
+# install_github("tobiasgf/lulu")
+library(lulu)
+library(tidyverse)
+library(dplyr)
+library(data.table)
+```
+
+# Prepare OTU Tables
+
+## Tele02 OTU Table
+```{r}
+# load the marker asv file from the eDNA Container App run and inspect
+tele02 <- read_csv("tele02_asv_count_tax_seqs.csv")
+head(tele02)
+colnames(tele02)
+
+# convert tele02 asv file to LULU format with samples as cols and OTUs with unique ID's as rows
+# select the Feature_ID column and all sample columns that start with "SRR"
+tele02_otu_table <- tele02 %>%
+  select(Feature_ID, starts_with("SRR")) # select Feature_IDs + sample count columns
+head(tele02_otu_table)
+
+# rename Feature_ID to OTUid (LULU expects OTU IDs in the first column) and inspect
+tele02_otu_table <- tele02_otu_table %>%
+  rename(OTUid = Feature_ID)
+head(tele02_otu_table)
+dim(tele02_otu_table)
+
+# coerce all sample columns (except OTU IDs) to numeric
+tele02_otu_table <- tele02_otu_table %>%
+  mutate(across(starts_with("SRR"), as.numeric)) # ensure sample counts are numeric
+
+# move OTUid to row names (LULU expects OTU IDs as row names, not as a column)
+tele02_otu_table <- tele02_otu_table %>%
+  column_to_rownames(var = "OTUid")
+
+# check if OTU IDs are unique
+n_unique <- length(rownames(tele02_otu_table)) == length(unique(rownames(tele02_otu_table)))
+
+if (n_unique) {
+  print("All OTU IDs are unique!")
+} else {
+  print("Warning: There are duplicate OTU IDs!")
+}
+
+# check for duplicate OTUs
+tele02_duplicate_otus <- tele02_otu_table %>%
+  as.data.frame() %>%
+  tibble::rownames_to_column(var = "OTUid") %>%  # Convert row names back to a column
+  count(OTUid) %>%
+  filter(n > 1)
+
+# print duplicates
+if (nrow(tele02_duplicate_otus) > 0) {
+  print("Duplicates found:")
+  print(tele02_duplicate_otus)
+} else {
+  print("No duplicate OTUs found!")
+}
+
+# save the OTU table as a .csv file
+write.csv(tele02_otu_table, "tele02_otu_table.csv")
+```
+
+## Vert01 OTU Table
+```{r}
+# load the marker asv file from the eDNA Container App run and inspect
+vert01 <- read_csv("vert01_asv_count_tax_seqs.csv")
+head(vert01)
+colnames(vert01)
+
+# convert vert01 asv file to LULU format with samples as cols and OTUs with unique ID's as rows
+# select the Feature_ID column and all sample columns that start with "SRR"
+vert01_otu_table <- vert01 %>%
+  select(Feature_ID, starts_with("SRR"))  # select Feature_IDs + sample count columns
+head(vert01_otu_table)
+
+# rename Feature_ID to OTUid (LULU expects OTU IDs in the first column) and inspect
+vert01_otu_table <- vert01_otu_table %>%
+  rename(OTUid = Feature_ID)
+head(vert01_otu_table)
+dim(vert01_otu_table)
+
+# coerce all sample columns (except OTU IDs) to numeric
+vert01_otu_table <- vert01_otu_table %>%
+  mutate(across(starts_with("SRR"), as.numeric))  # ensure sample counts are numeric
+
+# move OTUid to row names (LULU expects OTU IDs as row names, not as a column)
+vert01_otu_table <- vert01_otu_table %>%
+  column_to_rownames(var = "OTUid")
+
+# check if OTU IDs are unique
+n_unique_v01 <- length(rownames(vert01_otu_table)) == length(unique(rownames(vert01_otu_table)))
+
+if (n_unique_v01) {
+  print("All OTU IDs are unique!")
+} else {
+  print("Warning: There are duplicate OTU IDs!")
+}
+
+# check for duplicate OTUs
+vert01_duplicate_otus <- vert01_otu_table %>%
+  as.data.frame() %>%
+  tibble::rownames_to_column(var = "OTUid") %>%
+  count(OTUid) %>%
+  filter(n > 1)
+
+# print duplicates
+if (nrow(vert01_duplicate_otus) > 0) {
+  print("Duplicates found:")
+  print(vert01_duplicate_otus)
+} else {
+  print("No duplicate OTUs found!")
+}
+
+# save the OTU table as a .csv file
+write.csv(vert01_otu_table, "vert01_otu_table.csv")
+```
+
+# Generate Match Lists
+
+Navigate to the LULU directory in the terminal. 
+
+Input files:
+tele02_dna-sequences.fasta
+vert01_dna-sequences.fasta
+
+Commands to generate match list files for each marker using vsearch:
+
+tele02 match list script:
+
+vsearch --usearch_global tele02_dna-sequences.fasta \
+        --db tele02_dna-sequences.fasta \
+        --self --id .84 --iddef 1 \
+        --userout tele02_match_list.txt \
+        --userfields query+target+id \
+        --maxaccepts 0 --query_cov .9 --maxhits 10
+        
+vert01 match list script:
+
+vsearch --usearch_global vert01_dna-sequences.fasta \
+        --db vert01_dna-sequences.fasta \
+        --self --id .84 --iddef 1 \
+        --userout vert01_match_list.txt \
+        --userfields query+target+id \
+        --maxaccepts 0 --query_cov .9 --maxhits 10
+
+Output files:
+tele02_match_list.txt
+vert01_match_list.txt
+
+## Results Summary
+
+Commands to generate match list statistics for each marker using vsearch in self-matching mode (all sequences compared to all sequences in the same dataset). These statistics indicate the proportion of sequences within each marker that have one or more similar sequences in the same dataset (≥84% identity, ≥90% coverage), reflecting potential redundancy and the likelihood of OTU merging during LULU curation.
+
+# tele02 totals
+tele02_total=$(grep -c '^>' tele02_dna-sequences.fasta)
+tele02_matched=$(awk -F'\t' '($1!=$2){print $1}' tele02_match_list.txt | sort -u | wc -l | awk '{print $1}')
+tele02_pct=$(awk -v m="$tele02_matched" -v t="$tele02_total" 'BEGIN{printf "%.2f", 100*m/t}')
+
+# vert01 totals
+vert01_total=$(grep -c '^>' vert01_dna-sequences.fasta)
+vert01_matched=$(awk -F'\t' '($1!=$2){print $1}' vert01_match_list.txt | sort -u | wc -l | awk '{print $1}')
+vert01_pct=$(awk -v m="$vert01_matched" -v t="$vert01_total" 'BEGIN{printf "%.2f", 100*m/t}')
+
+# print a markdown-style table
+printf "| Marker | Total Sequences | Matched Sequences | Percent Matching |\n"
+printf "|--------|-----------------|-------------------|------------------|\n"
+printf "| Tele02 | %s | %s | %s%% |\n" "$tele02_total" "$tele02_matched" "$tele02_pct"
+printf "| Vert01 | %s | %s | %s%% |\n" "$vert01_total" "$vert01_matched" "$vert01_pct"
+
+### Actual Results
+| Marker   | Total Sequences  | Matched Sequences | Percent Matching |
+|----------|------------------|-------------------|------------------|
+| Tele02   | 661              | 296               | 44.78%           |
+| Vert01   | 324              | 223               | 68.83%           |
+
+
+# Run LULU
+Prior to running LULU, modify the fasta file headers in `tele02_dna-sequences.fasta` and `vert01_dna-sequences.fasta` using `headers_lulu.py` (Ballini et al. 2024).
+
+Input files:
+tele02_dna-sequences.fasta
+vert01_dna-sequences.fasta
+
+Commands to modify the fasta file headers for each marker:
+python3 headers_lulu.py tele02_dna-sequences.fasta tele02_dna-sequences_lulu.fasta
+python3 headers_lulu.py vert01_dna-sequences.fasta vert01_dna-sequences_lulu.fasta
+
+Output files:
+tele02_dna-sequences_lulu.fasta
+vert01_dna-sequences_lulu.fasta
+
+## Run LULU on Tele02
+```{r}
+# load the match list and rename columns
+tele02_match_list <- read_delim("tele02_match_list.txt", 
+                                delim = "\t",
+                                col_names = c("query", "target", "identity"))
+
+# check
+head(tele02_match_list)
+str(tele02_match_list)
+
+# convert OTU table to a numeric matrix (LULU requires a matrix, not a tibble)
+tele02_otu_table_matrix <- as.matrix(tele02_otu_table)
+
+# run LULU with min_seq_similarity = 87
+tele02_curated <- lulu(tele02_otu_table, tele02_match_list,
+                       minimum_ratio_type = "min",
+                       minimum_ratio = 1,
+                       minimum_match = 87, # adjusted similarity ratio
+                       minimum_relative_cooccurence = 0.95)
+
+# check structure of the curated results
+str(tele02_curated)
+
+# extract curated OTU table and save as CSV (including row names)
+write.csv(as.data.frame(tele02_curated$curated_table), "tele02_curated_otu_table.csv", row.names = TRUE)
+
+# extract discarded OTUs and save as CSV (including row names)
+write.csv(as.data.frame(tele02_curated$discarded_otus), "tele02_discarded_otus.csv", row.names = TRUE)
+
+# check final structure
+str(tele02_otu_table_matrix)
+head(tele02_otu_table_matrix)
+```
+
+## Run LULU on Vert01
+```{r}
+# load the match list and rename columns
+vert01_match_list <- read_delim("vert01_match_list.txt", 
+                                delim = "\t",
+                                col_names = c("query", "target", "identity"))
+
+# check
+head(vert01_match_list)
+str(vert01_match_list)
+
+# convert OTU table to a numeric matrix (LULU requires a matrix, not a tibble)
+vert01_otu_table_matrix <- as.matrix(vert01_otu_table)
+
+# run LULU with min_seq_similarity = 87
+vert01_curated <- lulu(vert01_otu_table, vert01_match_list,
+                       minimum_ratio_type = "min",
+                       minimum_ratio = 1,
+                       minimum_match = 87, # adjusted similarity ratio
+                       minimum_relative_cooccurence = 0.95)
+
+# check structure of the curated results
+str(vert01_curated)
+
+# extract curated OTU table and save as CSV (including row names)
+write.csv(as.data.frame(vert01_curated$curated_table), "vert01_curated_otu_table.csv", row.names = TRUE)
+
+# extract discarded OTUs and save as CSV (including row names)
+write.csv(as.data.frame(vert01_curated$discarded_otus), "vert01_discarded_otus.csv", row.names = TRUE)
+
+# check final structure
+str(vert01_otu_table_matrix)
+head(vert01_otu_table_matrix)
+```
+
+# Map Taxomony
+Add back toxonomic assignments from the original eDNA Container App outputs to the LULU-curated OTU tables. The goal is to restore the species names (or other taxonomic ranks) so OTUs assigned to the same taxon can be merged in the next step.Any missing taxonomy is labeled as "Unassigned".
+
+## Map Taxonomy for Tele02
+```{r}
+# read the curated OTU table
+tele02_cur <- read.csv("tele02_curated_otu_table.csv", check.names = FALSE)
+colnames(tele02_cur)[1] <- "Feature_ID"
+
+# read source ASV file that contains taxonomy
+tele02_src <- read_csv("tele02_asv_count_tax_seqs.csv", show_col_types = FALSE)
+
+# keep only taxonomy info
+tele02_tax <- tele02_src %>%
+  select(Feature_ID, Taxon, Confidence)
+
+# join taxonomy back to curated OTU table
+tele02_with_tax <- tele02_cur %>%
+  left_join(tele02_tax, by = "Feature_ID")
+
+# fill missing taxonomy
+tele02_with_tax$Taxon[is.na(tele02_with_tax$Taxon)] <- "Unassigned"
+
+# ensure sample columns are numeric
+tele02_sample_cols <- setdiff(colnames(tele02_with_tax),
+                              c("Feature_ID","Taxon","Confidence"))
+tele02_with_tax[tele02_sample_cols] <- lapply(tele02_with_tax[tele02_sample_cols], function(x){
+  y <- suppressWarnings(as.numeric(x)); y[is.na(y)] <- 0; y
+})
+
+# save
+write.csv(tele02_with_tax, "tele02_curated_with_tax.csv", row.names = FALSE)
+```
+
+## Map Taxonomy for Vert01
+```{r}
+# read the curated OTU table
+vert01_cur <- read.csv("vert01_curated_otu_table.csv", check.names = FALSE)
+colnames(vert01_cur)[1] <- "Feature_ID"
+
+# read source ASV file that contains taxonomy
+vert01_src <- read_csv("vert01_asv_count_tax_seqs.csv", show_col_types = FALSE)
+
+# keep only taxonomy info
+vert01_tax <- vert01_src %>%
+  select(Feature_ID, Taxon, Confidence)
+
+# join taxonomy back to curated OTU table
+vert01_with_tax <- vert01_cur %>%
+  left_join(vert01_tax, by = "Feature_ID")
+
+# fill missing taxonomy
+vert01_with_tax$Taxon[is.na(vert01_with_tax$Taxon)] <- "Unassigned"
+
+# ensure sample columns are numeric
+vert01_sample_cols <- setdiff(colnames(vert01_with_tax),
+                              c("Feature_ID","Taxon","Confidence"))
+vert01_with_tax[vert01_sample_cols] <- lapply(vert01_with_tax[vert01_sample_cols], function(x){
+  y <- suppressWarnings(as.numeric(x)); y[is.na(y)] <- 0; y
+})
+
+# save
+write.csv(vert01_with_tax, "vert01_curated_with_tax.csv", row.names = FALSE)
+```
+
+
+# Aggregate OTUs
+Merge all OTUs that share the same taxonomic assignment. Read counts for these OTUs are summed across all samples using `dplyr::summarise()`, producing a single row per taxon. This step reduces redundancy and creates the final abundance tables to be used in microDecon.
+
+## Aggregate Tele02
+```{r}
+# group OTU table by the Taxon column so that all OTUs with the same taxonomic assignment are grouped together
+tele02_aggregated <- tele02_with_tax %>%
+  group_by(Taxon) %>%
+  summarise(across(all_of(tele02_sample_cols), sum), .groups = "drop") # sum read counts across all sample columns for each taxon group
+
+# save
+write.csv(tele02_aggregated, "tele02_curated_otu_table_aggregated_microdecon.csv", row.names = FALSE)
+```
+
+## Aggregate Vert01
+```{r}
+# group OTU table by the Taxon column so that all OTUs with the same taxonomic assignment are grouped together
+vert01_aggregated <- vert01_with_tax %>%
+  group_by(Taxon) %>%
+  summarise(across(all_of(vert01_sample_cols), sum), .groups = "drop") # sum read counts across all sample columns for each taxon group
+
+# save
+write.csv(vert01_aggregated, "vert01_curated_otu_table_aggregated_microdecon.csv", row.names = FALSE)
+```
+
+
+Final output files for microDecon:
+tele02_curated_otu_table_aggregated_microdecon.csv  
+vert01_curated_otu_table_aggregated_microdecon.csv
+
+
