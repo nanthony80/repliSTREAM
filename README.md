@@ -122,8 +122,8 @@ Filter species tables and subsequent biodiversity analyses, including calculatio
    - [Chord diagrams for pipeline-species relationships](scripts/21_analyses/analyses_circlize_all_pipelines.Rmd)
    - [Ordination and diversity analyses (PCoA, PERMANOVA, PERMDISP)](scripts/22_analyses/analyses_PCoA_all_pieplines.Rmd)
 
-3. **Results** 
-   - For interpretation and discussion, see the [final report](link_to_report.pdf).
+**Results** 
+For interpretation and discussion, see the [final report](link_to_report.pdf).
 
 ---
 
