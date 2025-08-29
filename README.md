@@ -97,27 +97,27 @@ GUI pipeline run with settings matched to Barque where possible.
 
 **Steps:**  
 1. **Data Preparation**  
-   - [Rename sample files to eDNA-Container App-compatible format]](instructions/14_copy_rename_fastq.md)
+   - [Rename sample files to eDNA-Container App-compatible format](instructions/14_copy_rename_fastq.md)
 2. **Reference Database Conversion**  
    - [Convert CRABS database to QIIME2 format](instructions/15_CRABS_to_QIIME2.md)
 3. **eDNA-Container App Analysis**  
-   - [Run eDNA-Container App pipeline](instructions./16_edna_container_app)
+   - [Run eDNA-Container App pipeline](instructions./16_edna_container_app.md)
 4. **Post-Clustering Curation and Decontamination**  
-   - [Apply LULU](scripts/16_lulu_edna_container_app.Rmd)
-   - [Apply microDecon](scripts/17_microdecon_edna_container_app.Rmd)
+   - [Apply LULU](scripts/17_lulu_edna_container_app.Rmd)
+   - [Apply microDecon](scripts/18_microdecon_edna_container_app.Rmd)
   
 ---
 
 ### 4. Downstream Analyses & Results
 
 **Overview:**  
-Filter species tables and run diversity metrics, PERMANOVA and PERMDISP
+Filter species tables and subsequent biodiversity analyses, including calculation of diversity metrics, PERMANOVA, and PERMDISP for river communities across pipelines.
 
 **Steps:**
 1. **Filtering Species Tables**  
    - [Filter species tables for target species](notes/multihits_and_nontarget_species.md)
 2. **Downstream Analyses**  
-   - [Diversity metrics, PERMANOVA, PERMDISP](step08_downstream_analyses.md)
+   - 
 
 ---
 
