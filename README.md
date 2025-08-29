@@ -123,7 +123,7 @@ Filter species tables and subsequent biodiversity analyses, including calculatio
    - [Ordination and diversity analyses (PCoA, PERMANOVA, PERMDISP)](scripts/22_analyses/analyses_PCoA_all_pieplines.Rmd)
 
 **Results** 
-For interpretation and discussion, see the [final report](link_to_report.pdf).
+- For interpretation and discussion, see the [final report](link_to_report.pdf).
 
 ---
 
