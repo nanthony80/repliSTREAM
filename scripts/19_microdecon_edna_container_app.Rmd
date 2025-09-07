@@ -29,15 +29,16 @@ These files include both experimental and negative control samples and serve as 
 
 ## References
 
-Ballini, L., Staffoni, G., Nespoli, D. et al. Environmental DNA metabarcoding as an efficient tool to monitor freshwater systems in northwestern Italy. Hydrobiologia 852, 791–803 (2025). https://doi.org/10.1007/s10750-024-05723-y
+Ballini, L., Staffoni, G., Nespoli, D., et al. (2025). Environmental DNA metabarcoding as an efficient tool to monitor freshwater systems in northwestern Italy. Hydrobiologia, 852, 791–803. https://doi.org/10.1007/s10750-024-05723-y
 
-Frøslev, T.G., Kjøller, R., Bruun, H.H. et al. Algorithm for post-clustering curation of DNA amplicon data yields reliable biodiversity estimates. Nat Commun 8, 1188 (2017). https://doi.org/10.1038/s41467-017-01312-x
+Frøslev, T. G., Kjøller, R., Bruun, H. H., et al. (2017). Algorithm for post-clustering curation of DNA amplicon data yields reliable biodiversity estimates. Nature Communications, 8, 1188. https://doi.org/10.1038/s41467-017-01312-x
 
-Jeunen, G. J., Dowle, E., Edgecombe, J., von Ammon, U., Gemmell, N. J., & Cross, H. (2023). crabs-A software program to generate curated reference databases for metabarcoding sequencing data. Molecular ecology resources, 23(3), 725–738. https://doi.org/10.1111/1755-0998.13741
+Jeunen, G. J., Dowle, E., Edgecombe, J., von Ammon, U., Gemmell, N. J., & Cross, H. (2023). crabs: A software program to generate curated reference databases for metabarcoding sequencing data. Molecular Ecology Resources, 23(3), 725–738. https://doi.org/10.1111/1755-0998.13741
 
-McKnight, D. T., R. Huerlimann, D. S. Bower, L. Schwarzkopf, R. A. Alford, and K. R. Zenger. 2019. microDecon: A highly accurate read-subtraction tool for the post-sequencing removal of contamination in metabarcoding studies. Environmental DNA. https://doi.org/10.1002/edn3.11
+McKnight, D. T., Huerlimann, R., Bower, D. S., Schwarzkopf, L., Alford, R. A., & Zenger, K. R. (2019). microDecon: A highly accurate read-subtraction tool for the post-sequencing removal of contamination in metabarcoding studies. Environmental DNA. https://doi.org/10.1002/edn3.11
 
-Wheeler, D., Brancalion, L., Kawasaki, A., & Rourke, M. L. (2024). The eDNA-Container App: A Simple-to-Use Cross-Platform Package for the Reproducible Analysis of eDNA Sequencing Data. Applied Sciences, 14(6), 2641. https://doi.org/10.3390/app14062641
+Wheeler, D., Brancalion, L., Kawasaki, A., & Rourke, M. L. (2024). The eDNA-Container App: A simple-to-use cross-platform package for the reproducible analysis of eDNA sequencing data. Applied Sciences, 14(6), 2641. https://doi.org/10.3390/app14062641
+
 
 # Install package and load libraries
 ```{r}
