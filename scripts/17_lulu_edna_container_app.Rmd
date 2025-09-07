@@ -52,7 +52,7 @@ library(dplyr)
 library(data.table)
 ```
 
-# Prepare OTU Tables
+# Prepare OTU tables
 
 ## Tele02 OTU Table
 ```{r}
