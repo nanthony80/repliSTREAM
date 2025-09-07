@@ -1,8 +1,8 @@
 # 🧬repliSTREAM🐟
 
-## Introduction
-
 ### An Independent Learning Project Replicating Ballini et al. (2024) for Comparative Analysis of Bioinformatics Pipelines in eDNA Metabarcoding of Italian River Fish Communities
+
+## Introduction
 
 repliSTREAM is a project aimed at reproducing and extending the environmental DNA (eDNA) metabarcoding analysis of Ballini et al. (2024), with emphasis on freshwater fish biodiversity. Although the original study also reported amphibians, birds, and mammals from its multi-marker approach, this project limits its scope to fish taxa as a learning exercise in replicating the core biodiversity results of the original study.
 
