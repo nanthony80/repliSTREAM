@@ -117,10 +117,10 @@ Filter species tables and subsequent biodiversity analyses, including calculatio
 1. **Filtering Species Tables**  
    - [Filter species tables for target species](notes/multihits_and_nontarget_species.md)
 2. **Downstream Analyses**  
-   - [Species presence/absence table](scripts/19_analyses/analyses_richness_river_all_pipelines.Rmd)
-   - [Species read counts for Tele02 and Vert01](scripts/20_analyses/analyses_reads_all_pipelines.Rmd)
-   - [Chord diagrams for pipeline-species relationships](scripts/21_analyses/analyses_circlize_all_pipelines.Rmd)
-   - [Ordination and diversity analyses (PCoA, PERMANOVA, PERMDISP)](scripts/22_analyses/analyses_PCoA_all_pieplines.Rmd)
+   - [Species presence/absence table](scripts/19_analyses_richness_river_all_pipelines.Rmd)
+   - [Species read counts for Tele02 and Vert01](scripts/20_analyses_reads_all_pipelines.Rmd)
+   - [Chord diagrams for pipeline-species relationships](scripts/21_analyses_circlize_all_pipelines.Rmd)
+   - [Ordination and diversity analyses (PCoA, PERMANOVA, PERMDISP)](scripts/22_analyses_PCoA_all_pieplines.Rmd)
 
 **Results**  
 - For interpretation and discussion, see the [final report](link_to_report.pdf).
