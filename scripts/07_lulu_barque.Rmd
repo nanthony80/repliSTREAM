@@ -29,13 +29,13 @@ These tables include negative control (blank) samples, which were used by microD
 
 ## References
 
-Ballini, L., Staffoni, G., Nespoli, D. et al. Environmental DNA metabarcoding as an efficient tool to monitor freshwater systems in northwestern Italy. Hydrobiologia 852, 791–803 (2025). https://doi.org/10.1007/s10750-024-05723-y
+Ballini, L., Staffoni, G., Nespoli, D., et al. (2025). Environmental DNA metabarcoding as an efficient tool to monitor freshwater systems in northwestern Italy. Hydrobiologia, 852, 791–803. https://doi.org/10.1007/s10750-024-05723-y
 
-Frøslev, T.G., Kjøller, R., Bruun, H.H. et al. Algorithm for post-clustering curation of DNA amplicon data yields reliable biodiversity estimates. Nat Commun 8, 1188 (2017). https://doi.org/10.1038/s41467-017-01312-x
+Frøslev, T. G., Kjøller, R., Bruun, H. H., et al. (2017). Algorithm for post-clustering curation of DNA amplicon data yields reliable biodiversity estimates. Nature Communications, 8, 1188. https://doi.org/10.1038/s41467-017-01312-x
 
-Jeunen, G. J., Dowle, E., Edgecombe, J., von Ammon, U., Gemmell, N. J., & Cross, H. (2023). crabs-A software program to generate curated reference databases for metabarcoding sequencing data. Molecular ecology resources, 23(3), 725–738. https://doi.org/10.1111/1755-0998.13741
+Jeunen, G. J., Dowle, E., Edgecombe, J., von Ammon, U., Gemmell, N. J., & Cross, H. (2023). crabs: A software program to generate curated reference databases for metabarcoding sequencing data. Molecular Ecology Resources, 23(3), 725–738. https://doi.org/10.1111/1755-0998.13741
 
-Mathon, L., Valentini, A., Guérin, P. E., Normandeau, E., Noel, C., Lionnet, C., Boulanger, E., Thuiller, W., Bernatchez, L., Mouillot, D., Dejean, T., & Manel, S. (2021). Benchmarking bioinformatic tools for fast and accurate eDNA metabarcoding species identification. Molecular ecology resources, 21(7), 2565–2579. https://doi.org/10.1111/1755-0998.13430
+Mathon, L., Valentini, A., Guérin, P. E., Normandeau, E., Noel, C., Lionnet, C., Boulanger, E., Thuiller, W., Bernatchez, L., Mouillot, D., Dejean, T., & Manel, S. (2021). Benchmarking bioinformatic tools for fast and accurate eDNA metabarcoding species identification. Molecular Ecology Resources, 21(7), 2565–2579. https://doi.org/10.1111/1755-0998.13430
 
 
 
