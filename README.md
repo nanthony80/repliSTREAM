@@ -78,11 +78,11 @@ CLI pipeline run with settings matched to Barque where possible.
 
 **Steps:**  
 1. **Reference Database Conversion**  
-   - [Convert CRABS database to APSCALE-BLAST compatible format](instructions/09_CRABS_to_APSCALE.md)
+   - [Convert CRABS database to APSCALE-BLAST-compatible format](instructions/09_CRABS_to_APSCALE.md)
 2. **APSCALE Analysis**  
    - [Run APSCALE pipeline](instructions/10_apscale.md)
 3. **Taxonomic Assignment & Table Merging**  
-   - [APSCALE-BLAST assignment](instructions/11_apscale_blast.md)
+   - [APSCALE-BLAST taxonomic assignment](instructions/11_apscale_blast.md)
    - [Merge tables with TaxonTableTools2](instructions/12_ttt2.md)
 4. **Decontamination**
    Note: LULU is integrated in APSCALE.
@@ -132,7 +132,7 @@ Filter species tables and subsequent biodiversity analyses, including calculatio
 **Daniel Stratis**  
 GitHub: [@dswede43](https://github.com/dswede43)
 
-I am grateful to my project partner, Daniel Stratis, for his collaboration throughout this work, including identifying Ballini et al. (2024) as a suitable study for learning eDNA metabarcoding bioinformatics, supporting the curation of the CRABS reference database, advising on pipeline troubleshooting and analyses, and providing consistent feedback and encouragement along the way. His contributions were instrumental to the progress of this project and to my own learning journey.
+I am grateful to my project partner, Daniel Stratis, for his collaboration throughout this work, including identifying Ballini et al. (2024) as a suitable study for learning eDNA metabarcoding bioinformatics, supporting the curation of the CRABS reference database, advising on pipeline troubleshooting and analyses, and providing consistent feedback and encouragement along the way. His contributions were instrumental to the progress of this project and to my learning of eDNA metaboarcoding bioinformatics.
 
 ---
 
@@ -152,6 +152,7 @@ This project is for educational and research purposes. Original data belong to B
 - **McKnight, D. T., Huerlimann, R., Bower, D. S., Schwarzkopf, L., Alford, R. A., & Zenger, K. R. (2019).** microDecon: A highly accurate read-subtraction tool for the post-sequencing removal of contamination in metabarcoding studies. *Environmental DNA, 1*(1), 14–25. [https://doi.org/10.1002/edn3.11](https://doi.org/10.1002/edn3.11)
 - **Normandeau, E. (2024).** Barque v1.8.5: Environmental DNA metabarcoding analysis [Computer software]. GitHub. https://github.com/enormandeau/barque
 - **Riaz, T., Shehzad, W., Viari, A., Pompanon, F., Taberlet, P., & Coissac, E. (2011).** ecoPrimers: inference of new DNA barcode markers from whole genome sequence analysis. *Nucleic Acids Research, 39*(21), e145. [https://doi.org/10.1093/nar/gkr732](https://doi.org/10.1093/nar/gkr732)
+- **Staffoni, G. (accessed 31, August 2025).** STREAM. GitHub. [https://github.com/giorgiastaffoni/STREAM](https://github.com/giorgiastaffoni/STREAM)
 - **Taberlet, P., Bonin, A., Zinger, L., & Coissac, É. (2018).** *Environmental DNA: For Biodiversity Research and Monitoring.* Oxford University Press. [https://doi.org/10.1093/oso/9780198767220.001.0001](https://doi.org/10.1093/oso/9780198767220.001.0001) 
 - **Wheeler, D., Brancalion, L., Kawasaki, A., & Rourke, M. L. (2024).** The eDNA-Container App: A Simple-to-Use Cross-Platform Package for the Reproducible Analysis of eDNA Sequencing Data. *Applied Sciences*, 14(6), 2641. [https://doi.org/10.3390/app14062641](https://doi.org/10.3390/app14062641)
 
