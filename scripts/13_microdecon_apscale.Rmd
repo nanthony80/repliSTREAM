@@ -31,13 +31,13 @@ Because microDecon removes reads rather than entire OTUs, it is a significant im
 
 ## References
 
-Ballini, L., Staffoni, G., Nespoli, D. et al. (2025). Environmental DNA metabarcoding as an efficient tool to monitor freshwater systems in northwestern Italy. Hydrobiologia, 852, 791–803. https://doi.org/10.1007/s10750-024-05723-y
+Ballini, L., Staffoni, G., Nespoli, D., et al. (2025). Environmental DNA metabarcoding as an efficient tool to monitor freshwater systems in northwestern Italy. Hydrobiologia, 852, 791–803. https://doi.org/10.1007/s10750-024-05723-y
 
-Buchner, D., Macher, T. H., & Leese, F. (2022). APSCALE: advanced pipeline for simple yet comprehensive analyses of DNA metabarcoding data. Bioinformatics 38(20), 4817–4819. https://doi.org/10.1093/bioinformatics/btac588
+Buchner, D., Macher, T. H., & Leese, F. (2022). APSCALE: Advanced pipeline for simple yet comprehensive analyses of DNA metabarcoding data. Bioinformatics, 38(20), 4817–4819. https://doi.org/10.1093/bioinformatics/btac588
 
-Frøslev, T.G., Kjøller, R., Bruun, H.H. et al. (2017). Algorithm for post-clustering curation of DNA amplicon data yields reliable biodiversity estimates. Nat Commun, 8, 1188. https://doi.org/10.1038/s41467-017-01312-x
+Frøslev, T. G., Kjøller, R., Bruun, H. H., et al. (2017). Algorithm for post-clustering curation of DNA amplicon data yields reliable biodiversity estimates. Nature Communications, 8, 1188. https://doi.org/10.1038/s41467-017-01312-x
 
-Macher, T.H., Beermann, A. J., & Leese, F. (2021). TaxonTableTools—A comprehensive, platform-independent graphical user interface software to explore and visualise DNA metabarcoding data. Molecular Ecology Resources. https://doi.org/10.1111/1755-0998.13358
+Macher, T. H., Beermann, A. J., & Leese, F. (2021). TaxonTableTools—A comprehensive, platform-independent graphical user interface software to explore and visualise DNA metabarcoding data. Molecular Ecology Resources. https://doi.org/10.1111/1755-0998.13358
 
 McKnight, D. T., Huerlimann, R., Bower, D. S., Schwarzkopf, L., Alford, R. A., & Zenger, K. R. (2019). microDecon: A highly accurate read-subtraction tool for the post-sequencing removal of contamination in metabarcoding studies. Environmental DNA. https://doi.org/10.1002/edn3.11
 
