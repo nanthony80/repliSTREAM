@@ -1,0 +1,211 @@
+---
+title: "analyses_reads_all_pipelines"
+author: "Nicole Anthony"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# Introduction
+This analysis compares fish species read counts across six rivers in northwestern Italy using eDNA metabarcoding data processed by multiple bioinformatics pipelines. The pipelines evaluated include Barque-repliSTREAM, APSCALE, eDNA-Container App, and published results from Ballini et al. (2024). Each pipeline processes raw sequence data to generate read count tables for fish species detected in each river.
+
+# Data Sources and Processing
+## Pipeline Outputs:
+eDNA samples were processed using three bioinformatics pipelines: Barque-repliSTREAM, APSCALE, and eDNA-Container App. Each pipeline applies distinct algorithms for denoising, clustering, and taxonomic annotation of amplicon sequence variants (ASVs), exact sequence variants (ESVs), or operational taxonomic units (OTUs).
+
+
+# Workflow
+## Data Aggregation:
+Pipeline output tables are loaded, standardized for consistent taxon naming and river codes, and combined with literature data.
+
+## Table Construction:
+Species read counts are summarized for each river and pipeline, with detection flags indicating presence.
+
+## Visualization:
+Results are presented as interactive tables, with colored highlighting for pipeline sources and bold lines separating species.
+
+## Export:
+Summary tables are saved in CSV format for reporting and further analysis.
+
+## Output
+### Interactive Tables:
+Species read counts by river and pipeline, with colored highlighting for pipeline sources.
+### CSV Tables:
+Plain tables for downstream analysis.
+
+# References
+Ballini, L., Staffoni, G., Nespoli, D., et al. (2025). Environmental DNA metabarcoding as an efficient tool to monitor freshwater systems in northwestern Italy. Hydrobiologia, 852, 791–803. https://doi.org/10.1007/s10750-024-05723-y
+
+
+```{r}
+# load libraries
+library(dplyr)
+library(tidyr)
+library(readr)
+library(purrr)
+library(stringr)
+library(DT)
+
+# manually entered read counts from Ballini et al. (2024) for tele02 and vert01 markers
+ballini_tele02 <- tribble(
+  ~Family,        ~Species,                           ~ARG, ~ROI,    ~TAN, ~CAR, ~BEV, ~NER,
+  "Anguillidae",  "Anguilla anguilla",                277,  1838,     0,    0,    1457, 12187,
+  "Blenniidae",   "Salariopsis fluviatilis",          0,    391,      0,    0,    0,    0,
+  "Cottidae",     "Cottus gobio",                     0,    0,        5327, 0,    0,    0,
+  "Cyprinidae",   "Barbus meridionalis",              0,    1646,     0,    0,    50040,0,
+  "Cyprinidae",   "Barbus plebejus",                  11670,17045,    0,    0,    9743, 0,
+  "Gobiidae",     "Neogobius nigricans",              0,    0,        0,    48,   0,    0,
+  "Leuciscidae",  "Phoxinus sp.",                     0,    24353,    0,    0,    35330,0,
+  "Leuciscidae",  "Squalius squalus",                 0,    23070,    0,    0,    9722, 0,
+  "Leuciscidae",  "Telestes muticellus",              35343,585,      0,    29938,940,  225808,
+  "Salmonidae",   "Salmo sp.",                        0,    0,        9678, 39315,571,  0
+)
+ballini_vert01 <- tribble(
+  ~Family,        ~Species,                           ~ARG, ~ROI,    ~TAN, ~CAR, ~BEV, ~NER,
+  "Anguillidae",  "Anguilla anguilla",                0,    11237,    0,    0,    4138, 0,
+  "Blenniidae",   "Salariopsis fluviatilis",          0,    115,      0,    0,    0,    0,
+  "Cottidae",     "Cottus gobio",                     0,    0,        16423,0,    0,    0,
+  "Cyprinidae",   "Barbus plebejus",                  57489,100284,   0,    0,    137504,0,
+  "Cyprinidae",   "Barbus sp.",                       0,    149,      0,    0,    1286, 0,
+  "Gobiidae",     "Neogobius nigricans",              0,    0,        0,    317,  0,    0,
+  "Leuciscidae",  "Phoxinus sp.",                     0,    131641,   0,    0,    98133,0,
+  "Leuciscidae",  "Squalius squalus",                 0,    128453,   0,    0,    22384,0,
+  "Leuciscidae",  "Telestes sp.",                     139038,6480,    0,    54509,4138, 142545,
+  "Salmonidae",   "Salmo sp.",                        320,  0,        15271,120284,911, 0
+)
+
+# define paths for other results
+# replace these with your actual file locations
+file_paths <- list(
+  Barque = list(
+    tele02 = "path/to/your/barque/tele02_microdecon_output.csv",
+    vert01 = "path/to/your/barque/vert01_microdecon_output.csv"
+  ),
+  APSCALE = list(
+    tele02 = "path/to/your/apscale/tele02_microdecon_output.csv",
+    vert01 = "path/to/your/apscale/vert01_microdecon_output.csv"
+  ),
+  eDNA_Container = list(
+    tele02 = "path/to/your/edna_container_app/tele02_microdecon_output.csv",
+    vert01 = "path/to/your/edna_container_app/vert01_microdecon_output.csv"
+  )
+)
+
+# standardize river column names to short codes (alpha order)
+rename_rivers <- function(df) {
+  df %>%
+    rename(
+      ARG = argentina,
+      BEV = bevera,
+      CAR = carpasina,
+      NER = nervia,
+      ROI = roia,
+      TAN = tanaro
+    )
+}
+
+# set color map for pipeline highlighting in tables
+color_map <- c(
+  "Barque-Ballini et al. (2024)" = "#0072B2",
+  "Barque-repliSTREAM"           = "#009E73",
+  "APSCALE"                      = "#D55E00",
+  "eDNA-Container App"           = "#CC79A7"
+)
+
+# show interactive table with pipeline coloring and bold species separation
+show_table_long <- function(df, title) {
+  df <- df %>% mutate(row_id = row_number())
+  dt <- datatable(
+    df %>% select(-row_id),
+    rownames = FALSE,
+    escape = FALSE,
+    caption = htmltools::tags$caption(
+      style = 'caption-side: top; text-align: left;',
+      title
+    ),
+    options = list(
+      pageLength = 50,
+      scrollX = TRUE,
+      rowCallback = JS(
+        "function(row, data, index) {",
+        "  if(index > 0 && data[1] !== this.api().cell(index-1, 1).data()) {",
+        "    $('td', row).css('border-top', '3px solid #222');",
+        "  }",
+        "}"
+      )
+    )
+  ) %>%
+    formatStyle(
+      "Pipeline",
+      backgroundColor = styleEqual(names(color_map), color_map)
+    )
+  dt
+}
+
+# prep microDecon data as Family, Species, river columns
+prep_pipeline_data <- function(path, pipeline_name) {
+  read_csv(path, show_col_types = FALSE) %>%
+    rename_rivers() %>%
+    separate(OTU_ID, into = c("Family", "Species"), sep = " ", extra = "merge", fill = "right") %>%
+    mutate(Species = str_trim(Species)) %>%
+    select(Family, Species, ARG, BEV, CAR, NER, ROI, TAN) %>%
+    mutate(across(c(ARG, BEV, CAR, NER, ROI, TAN), ~ ifelse(. < 10, 0, .))) %>%
+    mutate(Detected = if_else(rowSums(select(., ARG, BEV, CAR, NER, ROI, TAN)) > 0, "✓", "X"),
+           Pipeline = pipeline_name)
+}
+
+# prep Ballini et al. (2024) data in same format
+prep_ballini_data <- function(ballini_df, pipeline_name) {
+  ballini_df %>%
+    mutate(across(c(ARG, BEV, CAR, NER, ROI, TAN), ~ ifelse(. < 10, 0, .))) %>%
+    mutate(Detected = if_else(rowSums(select(., ARG, BEV, CAR, NER, ROI, TAN)) > 0, "✓", "X"),
+           Pipeline = pipeline_name)
+}
+
+# italicize species names
+italicize_species <- function(df) {
+  df %>%
+    mutate(Species = paste0("<i>", Species, "</i>"))
+}
+
+# make reads table in long format
+make_reads_table <- function(df) {
+  df %>%
+    select(Family, Species, Pipeline, ARG, BEV, CAR, NER, ROI, TAN) %>%
+    arrange(Family, Species, Pipeline)
+}
+
+# load and prep all data
+# combine Ballini and pipeline data for tele02 and vert01 markers
+tele02_data <- bind_rows(
+  prep_ballini_data(ballini_tele02, "Barque-Ballini et al. (2024)"),
+  prep_pipeline_data(file_paths$Barque$tele02, "Barque-repliSTREAM"),
+  prep_pipeline_data(file_paths$APSCALE$tele02, "APSCALE"),
+  prep_pipeline_data(file_paths$eDNA_Container$tele02, "eDNA-Container App")
+) %>% italicize_species()
+
+vert01_data <- bind_rows(
+  prep_ballini_data(ballini_vert01, "Barque-Ballini et al. (2024)"),
+  prep_pipeline_data(file_paths$Barque$vert01, "Barque-repliSTREAM"),
+  prep_pipeline_data(file_paths$APSCALE$vert01, "APSCALE"),
+  prep_pipeline_data(file_paths$eDNA_Container$vert01, "eDNA-Container App")
+) %>% italicize_species()
+
+# long tables with coloring and bold species separation
+tele02_reads <- make_reads_table(tele02_data)
+vert01_reads <- make_reads_table(vert01_data)
+
+# show interactive tables for tele02 and vert01 markers
+show_table_long(tele02_reads, "Tele02 - Species Read Counts by River and Pipeline")
+show_table_long(vert01_reads, "Vert01 - Species Read Counts by River and Pipeline")
+
+# remove <i> tags before writing to .csv
+tele02_reads$Species <- gsub("<i>|</i>", "", tele02_reads$Species)
+write.csv(tele02_reads, "tele02_reads.csv", row.names = FALSE)
+
+vert01_reads$Species <- gsub("<i>|</i>", "", vert01_reads$Species)
+write.csv(vert01_reads, "vert01_reads.csv", row.names = FALSE)
+```
+
+
+
+

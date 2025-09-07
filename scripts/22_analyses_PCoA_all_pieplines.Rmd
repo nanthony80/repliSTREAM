@@ -1,0 +1,193 @@
+---
+title: "analyses_PCoA_all_pieplines"
+author: "Nicole Anthony"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# Introduction
+This analysis compares fish community composition across six rivers in northwestern Italy using eDNA metabarcoding data processed by three bioinformatics pipelines: APSCALE, Barque-repliSTREAM, and eDNA-Container App. For each pipeline and marker, both aggregated and disaggregated microDecon outputs are loaded, converted to presence/absence, and analyzed using ordination (PCoA) and multivariate statistics (PERMANOVA, PERMDISP). Results are visualized as PCoA plots colored by river, and statistical summaries are printed for each pipeline-marker combination.
+
+# Data Sources and Processing
+## Pipeline Outputs:
+Aggregated and disaggregated microDecon results are loaded for each pipeline and marker.
+
+## Markers:
+Two genetic markers are analyzed: tele02 and vert01.
+
+## Rivers:
+Six rivers are included, each assigned a distinct color for visualization.
+
+# Workflow
+Load and reshape data for each pipeline, marker, and river.
+Convert read counts to presence/absence.
+Prepare sample metadata and OTU matrices for ordination.
+Perform PCoA, PERMANOVA, and PERMDISP for each pipeline-marker combination.
+Visualize results as a grid of PCoA plots.
+Save plots as PDF and PNG.
+Print statistical summaries.
+
+# References
+Ballini, L., Staffoni, G., Nespoli, D., et al. (2025). Environmental DNA metabarcoding as an efficient tool to monitor freshwater systems in northwestern Italy. Hydrobiologia, 852, 791–803. https://doi.org/10.1007/s10750-024-05723-y
+
+```{r}
+# load packages
+library(tidyverse)
+library(vegan)     
+library(ape)        
+library(ggplot2)    
+library(patchwork) 
+
+# configure objects
+base_dir   <- "path/to/your/data"
+pipelines  <- c("apscale", "barque", "edna_container_app")
+markers    <- c("tele02", "vert01")
+rivers     <- c("argentina", "bevera", "carpasina", "nervia", "roia", "tanaro")
+
+# river colour map
+river_colors <- c(
+  argentina = "#F8766D",  # red
+  bevera    = "#B79F00",  # yellow
+  carpasina = "#00BA38",  # green
+  nervia    = "#00BFC4",  # cyan
+  roia      = "#619CFF",  # blue
+  tanaro    = "#C77CFF"   # purple
+)
+
+# data loading
+# load aggregated (per pipeline, per marker)
+load_aggregated <- function(pipeline, marker) {
+  file <- file.path(base_dir, pipeline, marker, "aggregated", paste0(marker, "_microdecon_output.csv"))
+  if (!file.exists(file)) return(NULL)
+  df <- read_csv(file, show_col_types=FALSE)
+  df <- df %>%
+    pivot_longer(-OTU_ID, names_to="River", values_to="Read_Count") %>%
+    mutate(Pipeline=pipeline, Marker=marker, Type="aggregated")
+  return(df)
+}
+
+# load disaggregated (per pipeline, marker, river, replicate)
+load_disaggregated <- function(pipeline, marker, river) {
+  dir <- file.path(base_dir, pipeline, marker, "disaggregated")
+  pattern <- paste0(marker, "_", river, "_cleaned")
+  # find file(s) matching pattern
+  file <- list.files(dir, pattern = paste0("^", pattern, ".*\\.csv$"), full.names = TRUE)
+  if (length(file) == 0) return(NULL)
+  df <- read_csv(file, show_col_types=FALSE)
+  # each column after OTU_ID is a replicate
+  df_long <- df %>%
+    pivot_longer(-OTU_ID, names_to="SampleID", values_to="Read_Count") %>%
+    mutate(Pipeline=pipeline, Marker=marker, River=river, Type="disaggregated")
+  return(df_long)
+}
+
+# load all data into one tibble
+all_data <- list()
+for (pipeline in pipelines) {
+  for (marker in markers) {
+    # aggregated
+    agg <- load_aggregated(pipeline, marker)
+    if (!is.null(agg)) all_data[[length(all_data)+1]] <- agg
+    # disaggregated
+    for (river in rivers) {
+      disagg <- load_disaggregated(pipeline, marker, river)
+      if (!is.null(disagg)) all_data[[length(all_data)+1]] <- disagg
+    }
+  }
+}
+all_data <- bind_rows(all_data)
+
+# data prep
+# remove NAs, convert to presence/absence
+all_data <- all_data %>%
+  mutate(Read_Count = replace_na(Read_Count, 0),
+         Presence   = as.integer(Read_Count > 0))
+
+# make a unique SampleID for each entry
+all_data <- all_data %>%
+  mutate(SampleID = case_when(
+    !is.na(SampleID) ~ SampleID,
+    Type == "aggregated" ~ paste(Marker, Pipeline, River, sep="_"),
+    TRUE ~ NA_character_
+  ))
+
+# remove any rows with missing SampleID
+all_data <- all_data %>% filter(!is.na(SampleID))
+
+# run analysis
+plot_list <- list()
+stats_list <- list()
+for (pipeline in pipelines) {
+  for (marker in markers) {
+    subdata <- all_data %>% filter(Pipeline == pipeline, Marker == marker)
+    if (nrow(subdata) == 0) next
+
+    # build sample x OTU matrix
+    pa_matrix <- subdata %>%
+      select(SampleID, OTU_ID, Presence, River) %>%
+      pivot_wider(names_from=OTU_ID, values_from=Presence, values_fill=0)
+    metadata <- pa_matrix %>% select(SampleID, River)
+    otu_matrix <- pa_matrix %>% select(-SampleID, -River)
+    keep <- rowSums(otu_matrix) > 0
+    metadata <- metadata[keep, ]
+    otu_matrix <- otu_matrix[keep, ]
+    if (nrow(otu_matrix) < 2) next
+
+    dist <- vegdist(otu_matrix, method="bray")
+    pcoa_res <- pcoa(dist)
+    scores <- as.data.frame(pcoa_res$vectors[, 1:2])
+    colnames(scores) <- c("PCoA1", "PCoA2")
+    scores$SampleID <- metadata$SampleID
+    scores$River <- metadata$River
+    scores$Pipeline <- pipeline
+    scores$Marker <- marker
+
+    perm_res <- adonis2(dist ~ River, data=metadata, permutations=999)
+    disp_res <- betadisper(dist, metadata$River)
+    disp_test <- permutest(disp_res, permutations=999)
+
+    stats_list[[paste(pipeline, marker, sep="_")]] <- list(PERMANOVA=perm_res, PERMDISP=disp_test)
+
+    plot_title <- paste("PCoA:", toupper(pipeline), marker)
+    p <- ggplot(scores, aes(x=PCoA1, y=PCoA2, color=River)) +
+      geom_point(size=4, alpha=0.5) +
+      theme_minimal(base_size=14) +
+      labs(title=plot_title,
+           subtitle=paste0("PERMANOVA p=", round(perm_res$`Pr(>F)`[1],3),
+                           "; PERMDISP p=", round(disp_test$tab$`Pr(>F)`[1],3)),
+           x=paste0("PCoA1 (", round(pcoa_res$values$Relative_eig[1]*100,2), "%)"),
+           y=paste0("PCoA2 (", round(pcoa_res$values$Relative_eig[2]*100,2), "%)"),
+           color="River") +
+      scale_color_manual(values = river_colors, breaks = names(river_colors))
+
+    # add annotation if Tanaro is missing
+    if (!"tanaro" %in% scores$River) {
+      xmax <- max(scores$PCoA1, na.rm=TRUE)
+      ymax <- max(scores$PCoA2, na.rm=TRUE)
+      p <- p +
+        annotate("text", x = xmax, y = ymax,
+                 label = "Tanaro: no samples detected",
+                 hjust = 1, vjust = 1.5, size = 3, color = river_colors["tanaro"])
+    }
+
+    plot_list[[paste(pipeline, marker, sep="_")]] <- p
+  }
+}
+
+# grid visualization
+wrap_plots(plot_list, ncol=length(markers), nrow=length(pipelines))
+
+# save
+ggsave("pcoa_grid.pdf", wrap_plots(plot_list, ncol=length(markers), nrow=length(pipelines)), width=12, height=9)
+ggsave("pcoa_grid.png", wrap_plots(plot_list, ncol=length(markers), nrow=length(pipelines)), width=12, height=9, dpi=300)
+
+#view stats
+for (nm in names(stats_list)) {
+  cat("====", nm, "====\n")
+  print(stats_list[[nm]]$PERMANOVA)
+  print(stats_list[[nm]]$PERMDISP)
+  cat("\n")
+}
+```
+
+

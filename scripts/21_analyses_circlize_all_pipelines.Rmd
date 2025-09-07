@@ -1,0 +1,352 @@
+---
+title: "analyses_circlize_all_pipelines"
+author: "Nicole Anthony"
+date: "`r Sys.Date()`"
+output: html_document
+---
+# Introduction
+This analysis compares fish species presence across six rivers in northwestern Italy using eDNA metabarcoding data processed by multiple bioinformatics pipelines. The pipelines evaluated include Barque-repliSTREAM, APSCALE, eDNA-Container App, and published results from Ballini et al. (2024). Each pipeline processes raw sequence data to generate presence/absence tables for fish species detected in each river.
+
+# Data Sources and Processing
+## Pipeline Outputs:
+eDNA samples were processed using three bioinformatics pipelines: Barque-repliSTREAM, APSCALE, and eDNA-Container App. Each pipeline applies distinct algorithms for denoising, clustering, and taxonomic annotation of amplicon sequence variants (ASVs), exact sequence variants (ESVs), or operational taxonomic units (OTUs).
+
+# Workflow
+## Data Loading and Standardization:
+Pipeline output tables are loaded, OTU identifiers are split into family and species, and river columns are standardized for consistent naming.
+
+## Presence/Absence Table Construction:
+Read count tables are converted to presence/absence format for each pipeline and marker. Literature data are manually entered for comparison.
+
+## Pipeline Comparison:
+Presence/absence data from all pipelines and the literature are combined to summarize species detection across pipelines.
+
+## Visualization:
+Chord diagrams are generated to visualize overlap and uniqueness of species detection among pipelines for each marker. Colors are assigned to each pipeline for clarity.
+
+## Summary Statistics:
+Compact summaries are generated for each marker, including species counts per pipeline, core species detected by all pipelines, unique detections, and Jaccard similarity indices.
+
+## Export:
+Chord diagrams are saved as PNG images for reporting and further analysis.
+
+# Output
+## Chord Diagrams:
+Visualize overlap and uniqueness of species detection among pipelines for each marker.
+
+## Summary Tables:
+Provide species counts, core species, unique detections, and pairwise similarity metrics.
+
+# References
+Ballini, L., Staffoni, G., Nespoli, D., et al. (2025). Environmental DNA metabarcoding as an efficient tool to monitor freshwater systems in northwestern Italy. Hydrobiologia, 852, 791–803. https://doi.org/10.1007/s10750-024-05723-y
+
+```{r}
+# load libraries
+library(circlize)
+library(dplyr)
+library(tidyverse)
+library(purrr)
+library(ComplexHeatmap)
+
+# load tele02 and vert01 aggregated microDecon outputs from each pipeline
+
+# Barque-repliSTREAM
+tele02_BR <- read_csv("path/to/your/barque/tele02_microdecon_output.csv")
+vert01_BR <- read_csv("path/to/your/barque/vert01_microdecon_output.csv")
+
+# APSCALE
+tele02_AS <- read_csv("path/to/your/apscale/tele02_microdecon_output.csv")
+vert01_AS <- read_csv("path/to/your/apscale/vert01_microdecon_output.csv")
+
+# eDNA-Container App
+tele02_CA <- read_csv("path/to/your/edna_container_app/tele02_microdecon_output.csv")
+vert01_CA <- read_csv("path/to/your/edna_container_app/vert01_microdecon_output.csv")
+
+# function to split OTU_ID into Family + Species if underscores present
+split_otu_id <- function(df) {
+  df %>%
+    # normalize underscores to spaces first
+    mutate(OTU_ID = gsub("_", " ", OTU_ID)) %>%
+    # split into Family and Species at the first space
+    separate(OTU_ID, into = c("Family", "Species"), sep = " ", extra = "merge", fill = "right")
+}
+
+# apply to each object
+tele02_BR <- split_otu_id(tele02_BR)
+vert01_BR <- split_otu_id(vert01_BR)
+tele02_AS <- split_otu_id(tele02_AS)
+vert01_AS <- split_otu_id(vert01_AS)
+tele02_CA <- split_otu_id(tele02_CA)
+vert01_CA <- split_otu_id(vert01_CA)
+
+# check
+tele02_BR
+vert01_BR
+tele02_AS
+vert01_AS
+tele02_CA
+vert01_CA
+```
+
+```{r}
+# define Tele02 and Vert01 species presence-absence for each pipeline (Ballini et al. (2024) manually entered from Supplemental information)
+
+# Ballini et al. (2024)
+# tele02 (Table S4, presence–absence)
+tele02_Ballini_pa <- tribble(
+  ~Family,        ~Species,                  ~ARG, ~ROI, ~TAN, ~CAR, ~BEV, ~NER,
+  "Anguillidae",  "Anguilla anguilla",       1,    1,    0,    0,    1,    1,
+  "Blenniidae",   "Salariopsis fluviatilis", 0,    1,    0,    0,    0,    0,
+  "Cottidae",     "Cottus gobio",            0,    0,    1,    0,    0,    0,
+  "Cyprinidae",   "Barbus meridionalis",     0,    1,    0,    0,    1,    0,
+  "Cyprinidae",   "Barbus plebejus",         1,    1,    0,    0,    1,    0,
+  "Gobiidae",     "Neogobius nigricans",     0,    0,    0,    1,    0,    0,
+  "Leuciscidae",  "Phoxinus sp.",            0,    1,    0,    0,    1,    0,
+  "Leuciscidae",  "Squalius squalus",        0,    1,    0,    0,    1,    0,
+  "Leuciscidae",  "Telestes muticellus",     1,    1,    0,    1,    1,    1,
+  "Salmonidae",   "Salmo sp.",               0,    0,    1,    1,    1,    0
+)
+
+# vert01 (Table S3, presence–absence)
+vert01_Ballini_pa <- tribble(
+  ~Family,        ~Species,                  ~ARG, ~ROI, ~TAN, ~CAR, ~BEV, ~NER,
+  "Anguillidae",  "Anguilla anguilla",       0,    1,    0,    0,    1,    0,
+  "Blenniidae",   "Salariopsis fluviatilis", 0,    1,    0,    0,    0,    0,
+  "Cottidae",     "Cottus gobio",            0,    0,    1,    0,    0,    0,
+  "Cyprinidae",   "Barbus plebejus",         1,    1,    0,    0,    1,    0,
+  "Cyprinidae",   "Barbus sp.",              0,    1,    0,    0,    1,    0,
+  "Gobiidae",     "Neogobius nigricans",     0,    0,    0,    1,    0,    0,
+  "Leuciscidae",  "Phoxinus sp.",            0,    1,    0,    0,    1,    0,
+  "Leuciscidae",  "Squalius squalus",        0,    1,    0,    0,    1,    0,
+  "Leuciscidae",  "Telestes sp.",            1,    1,    0,    1,    1,    1,
+  "Salmonidae",   "Salmo sp.",               1,    0,    1,    1,    1,    0
+)
+
+# define function to convert taxonomy tables to presence/absence
+to_presence_absence <- function(df) {
+  df %>%
+    mutate(across(-c(Family, Species), ~ ifelse(. > 0, 1, 0)))
+}
+
+# apply to each dataset
+# Barque-repliSTREAM
+tele02_BR_pa <- to_presence_absence(tele02_BR)
+vert01_BR_pa <- to_presence_absence(vert01_BR)
+
+# APSCALE
+tele02_AS_pa <- to_presence_absence(tele02_AS)
+vert01_AS_pa <- to_presence_absence(vert01_AS)
+
+# eDNA-Container App
+tele02_CA_pa <- to_presence_absence(tele02_CA)
+vert01_CA_pa <- to_presence_absence(vert01_CA)
+
+# check
+tele02_Ballini_pa
+vert01_Ballini_pa
+tele02_BR_pa
+vert01_BR_pa
+tele02_AS_pa
+vert01_AS_pa
+tele02_CA_pa
+vert01_CA_pa
+
+str(tele02_Ballini_pa)
+str(vert01_Ballini_pa)
+str(tele02_BR_pa)
+str(vert01_BR_pa)
+str(tele02_AS_pa)
+str(vert01_AS_pa)
+str(tele02_CA_pa)
+str(vert01_CA_pa)
+```
+
+```{r}
+# combine pipeline presence-absence tables for each marker
+
+# rivers in Ballini et al. (2024) tables
+RIVERS_ABBR <- c("ARG","ROI","TAN","CAR","BEV","NER")
+
+# rename your river columns to match the abbreviations
+rename_to_abbr <- function(df) {
+  df %>%
+    rename(
+      ARG = argentina,
+      BEV = bevera,
+      CAR = carpasina,
+      NER = nervia,
+      ROI = roia,
+      TAN = tanaro
+    )
+}
+
+# compute pipeline-level presence
+pipeline_presence <- function(df, rivers = RIVERS_ABBR) {
+  df %>%
+    mutate(Present = as.integer(rowSums(across(all_of(rivers))) > 0)) %>%
+    select(Family, Species, Present)
+}
+
+# tele02
+tele02_list <- list(
+  "Barque-Ballini et al. (2024)" = tele02_Ballini_pa,
+  "Barque-repliSTREAM"           = rename_to_abbr(tele02_BR_pa),
+  "APSCALE"                      = rename_to_abbr(tele02_AS_pa),
+  "eDNA-Container App"           = rename_to_abbr(tele02_CA_pa)
+)
+
+tele02_all <- imap(tele02_list, ~ pipeline_presence(.x) %>%
+                     rename(!! .y := Present)) %>%
+  reduce(full_join, by = c("Family","Species")) %>%
+  mutate(across(names(tele02_list), ~ replace_na(., 0L))) %>%
+  arrange(Family, Species)
+
+# vert01
+vert01_list <- list(
+  "Barque-Ballini et al. (2024)" = vert01_Ballini_pa,
+  "Barque-repliSTREAM"           = rename_to_abbr(vert01_BR_pa),
+  "APSCALE"                      = rename_to_abbr(vert01_AS_pa),
+  "eDNA-Container App"           = rename_to_abbr(vert01_CA_pa)
+)
+
+vert01_all <- imap(vert01_list, ~ pipeline_presence(.x) %>%
+                     rename(!! .y := Present)) %>%
+  reduce(full_join, by = c("Family","Species")) %>%
+  mutate(across(names(vert01_list), ~ replace_na(., 0L))) %>%
+  arrange(Family, Species)
+
+# check
+head(tele02_all)
+head(vert01_all)
+```
+
+
+```{r}
+# define colors for each pipeline (color-blind friendly)
+pipeline_cols <- c(
+  "Barque-Ballini et al. (2024)" = "#0072B2",  # blue
+  "Barque-repliSTREAM"           = "#009E73",  # bluish green
+  "APSCALE"                      = "#D55E00",  # vermillion
+  "eDNA-Container App"           = "#CC79A7"   # reddish purple
+)
+
+# turn a presence/absence table into: Species + present (yes/no across all sites)
+presence_from_pa <- function(pa_tbl) {
+  tibble(
+    Species = pa_tbl$Species,
+    present = rowSums(dplyr::select(pa_tbl, -Family, -Species)) > 0
+  )
+}
+
+# combine all pipelines into one wide table:
+# species + one column per pipeline (1 = present, 0 = absent)
+build_pipeline_species <- function(bb_pa, br_pa, as_pa, ca_pa) {
+  bb <- presence_from_pa(bb_pa) %>% dplyr::rename(`Barque-Ballini et al. (2024)` = present)
+  br <- presence_from_pa(br_pa) %>% dplyr::rename(`Barque-repliSTREAM`           = present)
+  as <- presence_from_pa(as_pa) %>% dplyr::rename(`APSCALE`                      = present)
+  ca <- presence_from_pa(ca_pa) %>% dplyr::rename(`eDNA-Container App`           = present)
+
+  bb %>%
+    dplyr::full_join(br, by = "Species") %>%
+    dplyr::full_join(as, by = "Species") %>%
+    dplyr::full_join(ca, by = "Species") %>%
+    dplyr::mutate(dplyr::across(-Species, ~ as.integer(tidyr::replace_na(., FALSE))))
+}
+
+# draw the chord diagram: pipelines (left) vs. species (around the circle)
+plot_pipeline_species_chord <- function(df, marker_label = "") {
+  stopifnot("Species" %in% names(df))
+  pipelines <- setdiff(names(df), "Species")
+
+  # make long table: one row per (pipeline, species) where present = 1
+  links <- df %>%
+    tidyr::pivot_longer(dplyr::all_of(pipelines), names_to = "Pipeline", values_to = "Present") %>%
+    dplyr::filter(Present > 0) %>%
+    dplyr::transmute(from = Pipeline, to = Species, value = 1)
+
+  # order: pipelines first, then species (alphabetical)
+  species_levels <- sort(unique(links$to))
+  sector_order   <- c(pipelines, species_levels)
+
+  # colors: pipelines use chosen palette; species are light gray
+  grid_col <- c(pipeline_cols[pipelines],
+                stats::setNames(rep("#D0D0D0", length(species_levels)), species_levels))
+
+  # spacing between groups (wider gap after pipelines and species)
+  gap_after <- c(rep(10, length(pipelines) - 1), 18,
+                 rep(2,  length(species_levels) - 1), 18)
+
+  # rotate so pipelines appear on the LEFT
+  circlize::circos.clear()
+  circlize::circos.par(
+    start.degree = 270,                 
+    gap.after = gap_after,
+    track.margin = c(0, 0),
+    cell.padding = c(0, 0, 0, 0),
+    canvas.xlim = c(-1.40, 1.40),       
+    canvas.ylim = c(-1.40, 1.40),
+    points.overflow.warning = FALSE
+  )
+
+  # draw the chords
+  circlize::chordDiagram(
+    x = links,
+    order = sector_order,
+    grid.col = grid_col,
+    transparency = 0.25,
+    directional = 0,
+    annotationTrack = "grid",
+    preAllocateTracks = list(track.height = 0.10)
+  )
+
+  # add labels: pipelines inside, species outside
+  circlize::circos.trackPlotRegion(track.index = 1, bg.border = NA, panel.fun = function(x, y) {
+    sector <- circlize::get.cell.meta.data("sector.index")
+    xlim   <- circlize::get.cell.meta.data("xlim")
+    ylim   <- circlize::get.cell.meta.data("ylim")
+    xmid   <- mean(xlim)
+
+    if (sector %in% pipelines) {
+      # pipeline name inside its block
+      circlize::circos.text(
+        xmid, mean(ylim), sector,
+        facing = "bending.inside", niceFacing = TRUE,
+        cex = 0.45, font = 2, col = "black"
+      )
+    } else {
+      # species name just outside
+      y_off <- circlize::convert_y(-0.5, "mm",
+                                   sector.index = sector, track.index = 1)
+      circlize::circos.text(
+        xmid, ylim[2] + y_off, sector,
+        facing = "clockwise", niceFacing = FALSE,
+        adj = c(0, 0), cex = 0.50, font = 3
+      )
+    }
+  })
+
+  # add a title in the center
+  if (nzchar(marker_label)) graphics::text(0, 0, marker_label, cex = 0.9, font = 2)
+}
+
+# check
+tele02_all <- build_pipeline_species(tele02_Ballini_pa, tele02_BR_pa,
+                                     tele02_AS_pa,      tele02_CA_pa)
+plot_pipeline_species_chord(tele02_all, marker_label = "Tele02")
+
+vert01_all <- build_pipeline_species(vert01_Ballini_pa, vert01_BR_pa,
+                                     vert01_AS_pa,      vert01_CA_pa)
+plot_pipeline_species_chord(vert01_all, marker_label = "Vert01")
+
+# save as PNG
+png("tele02_chord.png", width = 2000, height = 2000, res = 300)
+plot_pipeline_species_chord(tele02_all, marker_label = "Tele02")
+dev.off()
+
+# save as PNG
+png("vert01_chord.png", width = 2000, height = 2000, res = 300)
+plot_pipeline_species_chord(vert01_all, marker_label = "Vert01")
+dev.off()
+```
+
+

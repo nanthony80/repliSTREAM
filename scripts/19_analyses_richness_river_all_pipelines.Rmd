@@ -1,0 +1,271 @@
+---
+title: "analyses_richness_river_all_pipelines"
+author: "Nicole Anthony"
+date: "`r Sys.Date()`"
+output: html_document
+---
+# Introduction
+This analysis compares fish community composition across six rivers in northwestern Italy using eDNA metabarcoding data processed by multiple bioinformatics pipelines. The pipelines evaluated include Barque-repliSTREAM, APSCALE, eDNA-Container App, and published results from Ballini et al. (2024). Each pipeline processes raw sequence data to generate presence/absence tables for fish species detected in each river.
+
+# Data Sources and Processing
+## Pipeline Outputs:
+eDNA samples were processed using three bioinformatics pipelines: Barque-repliSTREAM, APSCALE, and eDNA-Container App. Each pipeline applies distinct algorithms for denoising, clustering, and taxonomic annotation of amplicon sequence variants (ASVs), exact sequence variants (ESVs) or operational taxonomic units (OTUs).
+
+# Workflow
+## Data Aggregation:
+Pipeline output tables are loaded and standardized for consistent taxon naming and river codes.
+
+## Presence/Absence Table Construction:
+Species presence is summarized for each river and pipeline, including literature data.
+
+## Visualization:
+Results are presented as HTML and PNG tables, with colored symbols indicating which pipeline(s) detected each species in each river.
+
+## Export:
+Summary tables are saved in HTML, PNG, and CSV formats for reporting and further analysis.
+
+## Output
+HTML Table:
+Interactive table showing species detected per river and pipeline, with colored symbols for each pipeline.
+
+PNG Table:
+Static image of the HTML table for publication or presentation.
+
+CSV Table:
+Plain presence/absence table for downstream analysis.
+
+# References
+Ballini, L., Staffoni, G., Nespoli, D., et al. (2025). Environmental DNA metabarcoding as an efficient tool to monitor freshwater systems in northwestern Italy. Hydrobiologia, 852, 791–803. https://doi.org/10.1007/s10750-024-05723-y
+
+```{r}
+# load libraries
+library(tidyverse)
+library(readr)
+library(stringr)
+library(kableExtra)
+
+# define pipeline labels, order, and colors for visualization
+pipeline_labels <- c(
+  barque  = "Barque-repliSTREAM",
+  apscale = "APSCALE",
+  edna    = "eDNA-Container App",
+  ballini = "Barque-Ballini et al. (2024)"    # NEW
+)
+pipeline_order <- c(
+  "Barque-Ballini et al. (2024)",
+  "Barque-repliSTREAM",
+  "APSCALE",
+  "eDNA-Container App"
+)
+pipeline_cols  <- c(
+  "Barque-Ballini et al. (2024)" = "#0072B2",
+  "Barque-repliSTREAM"           = "#009E73",
+  "APSCALE"                      = "#FF9900",
+  "eDNA-Container App"           = "#CC79A7"
+)
+
+# define short river codes in alpha order
+river_short <- c("ARG","BEV","CAR","NER","ROI","TAN")
+river_full  <- c("Argentina","Bevera","Carpasina","Nervia","Roia","Tanaro")
+river_map   <- setNames(river_short, river_full)
+river_levels <- names(sort(river_map)) # So: Argentina, Bevera, Carpasina, Nervia, Roia, Tanaro
+
+# read CSV file
+read_any <- function(fp) {
+  read_csv(fp, show_col_types = FALSE)
+}
+
+# normalize taxon names for consistent formatting
+norm_taxon <- function(otu_id_vec) {
+  x <- str_squish(gsub("_", " ", otu_id_vec))
+  toks <- strsplit(x, "\\s+")
+  fam   <- vapply(toks, function(tt) if (length(tt) >= 1) tt[1] else NA_character_, character(1))
+  rest  <- vapply(toks, function(tt) if (length(tt) >= 2) paste(tt[-1], collapse = " ") else NA_character_, character(1))
+  Species <- vapply(rest, function(r) {
+    if (is.na(r) || r == "") return(NA_character_)
+    rtoks <- strsplit(r, "\\s+")[[1]]
+    genus <- rtoks[1]
+    tail  <- if (length(rtoks) > 1) paste(rtoks[-1], collapse = " ") else ""
+    genus_tc <- str_to_title(genus)
+    if (tail == "" || tolower(tail) %in% c("sp","sp.","spp","unknown")) {
+      return(paste(genus_tc, "sp."))
+    } else {
+      return(paste(genus_tc, tolower(tail)))
+    }
+  }, character(1))
+  tibble(
+    Family  = str_to_title(fam),
+    Species = Species
+  )
+}
+
+# load and process a single disaggregated file
+load_disagg_file <- function(file, pipeline_id, marker) {
+  df <- read_any(file)
+  if (!"OTU_ID" %in% names(df)) stop("OTU_ID column missing in: ", file)
+  b <- tolower(basename(file))
+  river_vocab <- tolower(river_full)
+  river <- stringr::str_extract(b, paste(river_vocab, collapse = "|"))
+  if (is.na(river)) {
+    parent <- tolower(basename(dirname(file)))
+    river  <- gsub("^(tele02|vert01)_|_cleaned$", "", parent)
+  }
+  df_long <- df %>%
+    mutate(OTU_ID = str_squish(gsub("_", " ", OTU_ID))) %>%
+    pivot_longer(-OTU_ID, names_to = "ReplicateCol", values_to = "Count") %>%
+    mutate(
+      Pipeline = pipeline_labels[pipeline_id],
+      Marker   = marker,
+      River    = river_map[str_to_title(river)],  # use short code
+      Count    = suppressWarnings(as.numeric(Count)),
+      Presence = as.integer(!is.na(Count) & Count > 0)
+    ) %>%
+    bind_cols(norm_taxon(.$OTU_ID)) %>%
+    select(Pipeline, Marker, River, Family, Species, Presence)
+  df_long
+}
+
+# load all files from a pipeline/marker root directory
+load_disagg_root <- function(root, pipeline_id, marker) {
+  if (!dir.exists(root)) return(tibble())
+  files <- list.files(root, pattern = "_cleaned\\.(csv|tsv)$", full.names = TRUE, recursive = TRUE)
+  purrr::map_dfr(files, load_disagg_file, pipeline_id = pipeline_id, marker = marker)
+}
+
+# create HTML for colored × symbols for each pipeline
+make_cell_html <- function(pipelines_here) {
+  labs <- intersect(pipeline_order, unique(pipelines_here))
+  if (!length(labs)) return("")
+  spans <- sprintf(
+    "<span style='display:inline-block;color:%s;font-weight:600;font-size:24px;margin-right:2px'>&times;</span>",
+    unname(pipeline_cols[labs])
+  )
+  paste0(spans, collapse = "")
+}
+
+# load files
+# specify pipeline roots and markers (update paths as needed)
+roots <- tribble(
+  ~PipelineID, ~Marker,  ~Root,
+  "barque",    "tele02", "path/to/your/data/barque/tele02/disaggregated",
+  "barque",    "vert01", "path/to/your/data/barque/vert01/disaggregated",
+  "apscale",   "tele02", "path/to/your/data/apscale/tele02/disaggregated",
+  "apscale",   "vert01", "path/to/your/data/apscale/vert01/disaggregated",
+  "edna",      "tele02", "path/to/your/data/edna_container_app/tele02/disaggregated",
+  "edna",      "vert01", "path/to/your/data/edna_container_app/vert01/disaggregated"
+)
+
+# load and combine all pipeline data
+disagg <- purrr::pmap_dfr(
+  list(roots$Root, roots$PipelineID, roots$Marker),
+  load_disagg_root
+)
+
+# filter for presence and deduplicate
+pa <- disagg %>%
+  filter(Presence == 1) %>%
+  select(Pipeline, River, Family, Species) %>%
+  distinct()
+
+# add Barque-Ballini et al. (2024) presence data
+ballini_tbl <- tribble(
+  ~Family,      ~Species,                 ~ARG, ~BEV, ~CAR, ~NER, ~ROI, ~TAN,
+  "Anguillidae","Anguilla anguilla",      "×",  "×",   "",   "×",  "×",   "",
+  "Blenniidae", "Salariopsis fluviatilis","",   "",    "",   "",   "×",   "",
+  "Cyprinidae", "Barbus meridionalis",    "",   "×",   "",   "",   "×",   "",
+  "Cyprinidae", "Barbus plebejus",        "×",  "×",   "",   "",   "×",   "",
+  "Leuciscidae","Phoxinus sp.",           "",   "×",   "",   "",   "×",   "",
+  "Leuciscidae","Squalius squalus",       "",   "×",   "",   "",   "×",   "",
+  "Leuciscidae","Telestes muticellus",    "×",  "×",   "×",  "×",  "×",   "",
+  "Gobiidae",   "Neogobius nigricans",    "",   "",    "×",  "",   "",    "",
+  "Cottidae",   "Cottus gobio",           "",   "",    "",   "",   "",    "×",
+  "Salmonidae", "Salmo sp.",              "",   "×",   "×",  "",   "",    "×"
+)
+
+ballini_long <- ballini_tbl %>%
+  pivot_longer(cols = ARG:TAN, names_to = "River", values_to = "Presence") %>%
+  filter(Presence == "×") %>%
+  mutate(
+    Pipeline = "Barque-Ballini et al. (2024)",
+    Marker = NA_character_
+  ) %>%
+  select(Pipeline, River, Family, Species)
+
+# combine all presence data
+pa_combined <- bind_rows(pa, ballini_long)
+
+# build tables
+# create HTML cells with colored ×’s (multiple pipelines per river)
+cells_html <- pa_combined %>%
+  group_by(Family, Species, River) %>%
+  summarise(Cell = make_cell_html(Pipeline), .groups = "drop") %>%
+  mutate(River = factor(River, levels = river_short)) %>%
+  group_by(Family, Species) %>%
+  complete(River = river_short, fill = list(Cell = "")) %>%
+  ungroup() %>%
+  arrange(Family, Species, River) %>%
+  pivot_wider(names_from = River, values_from = Cell) %>%
+  arrange(Family, Species)
+
+# create plain presence table (just “×” if any pipeline present)
+cells_plain <- pa_combined %>%
+  mutate(X = "×") %>%
+  group_by(Family, Species, River) %>%
+  summarise(X = ifelse(n() > 0, "×", ""), .groups = "drop") %>%
+  mutate(River = factor(River, levels = river_short)) %>%
+  group_by(Family, Species) %>%
+  complete(River = river_short, fill = list(X = "")) %>%
+  ungroup() %>%
+  arrange(Family, Species, River) %>%
+  pivot_wider(names_from = River, values_from = X) %>%
+  arrange(Family, Species)
+
+stopifnot(!any(duplicated(cells_html[, c("Family","Species")])))
+stopifnot(!any(duplicated(cells_plain[, c("Family","Species")])))
+
+# define HTML legend for table
+pipeline_legend <- paste(
+  "<span style='font-size:2em;font-weight:bold;'>Fish community composition by river</span><br>",
+  "Legend: ",
+  "<span style='color:#0072B2;font-size:1.5em;font-weight:bold;'>&times;</span> Barque-Ballini et al. (2024)&nbsp;&nbsp;",
+  "<span style='color:#009E73;font-size:1.5em;font-weight:bold;'>&times;</span> Barque-repliSTREAM&nbsp;&nbsp;",
+  "<span style='color:#FF9900;font-size:1.5em;font-weight:bold;'>&times;</span> APSCALE&nbsp;&nbsp;",
+  "<span style='color:#CC79A7;font-size:1.5em;font-weight:bold;'>&times;</span> eDNA-Container App"
+)
+
+# generate HTML table with colored × symbols
+html_tbl <- cells_html %>%
+  select(Family, Species, all_of(river_short)) %>%
+  kbl(
+    escape    = FALSE,
+    align     = c("l","l", rep("c", length(river_short))),
+    col.names = c("Family","Species", river_short),
+    caption   = pipeline_legend
+  ) %>%
+  kable_paper(full_width = TRUE) %>%
+  column_spec(3:(2 + length(river_short)), width = "7em") %>%
+  collapse_rows(columns = 1, valign = "top")
+html_tbl
+
+# save (update output path as needed)
+# HTML table (with legend)
+save_kable(
+  html_tbl,
+  file = "path/to/output/fish_presence_table.html",
+  zoom = 2
+)
+
+# PNG image of table
+save_kable(
+  html_tbl,
+  file = "path/to/output/fish_presence_table.png",
+  zoom = 2
+)
+
+# CSV (plain, presence-only “×”)
+write_csv(
+  cells_plain %>% select(Family, Species, all_of(river_short)),
+  "path/to/output/fish_presence_table.csv"
+)
+```
+
