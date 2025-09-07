@@ -16,7 +16,7 @@ This project is part of my personal learning in eDNA metabarcoding bioinformatic
 
 | Pipeline | Description | Output Type |
 |----------|-------------|-------------|
-| **Barque > LULU > microDecon** | CLI pipeline used by Ballini et al. (2024); OTU-based; integrates Trimmomatic, FLASH, VSEARCH, and custom scripts. LULU and microDecon applied post-Barque. | **OTUs** |
+| **Barque > LULU > microDecon** | CLI pipeline used by Ballini et al. (2024); integrates Trimmomatic, FLASH, VSEARCH (UNOISE3 denoising), and custom scripts. Produces OTUs using a curated reference database. LULU and microDecon applied post-Barque. | **OTUs** |
 | **APSCALE (LULU) > microDecon** | CLI pipeline integrating VSEARCH, cutadapt, and clustering/denoising steps. Produces both OTUs (clustering) and ESVs (UNOISE denoising). LULU built in; microDecon applied separately. | **OTUs + ESVs** |
 | **eDNA-Container App > LULU > microDecon** | GUI pipeline built on QIIME2; uses cutadapt + DADA2 for denoising. Produces ASVs with taxonomy assignments. LULU and microDecon applied post-analysis. | **ASVs** |
 
