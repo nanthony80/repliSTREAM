@@ -134,6 +134,9 @@ GitHub: [@dswede43](https://github.com/dswede43)
 
 I am grateful to my project partner, Daniel Stratis, for his collaboration throughout this work, including identifying Ballini et al. (2024) as a suitable study for learning eDNA metabarcoding bioinformatics, supporting the curation of the CRABS reference database, advising on pipeline troubleshooting and analyses, and providing consistent feedback and encouragement along the way. His contributions were instrumental to the progress of this project and to my learning of eDNA metaboarcoding bioinformatics.
 
+We thank Ballini et al. (2024) for making their data and workflow openly available, which enabled this project to be reproduced as a learning exercise. Generative AI tools, including ChatGPT, DALL·E (OpenAI), and GitHub Copilot (GitHub, Inc.), were used to support coding, fish icon creation, editing, and documentation. Their use formed part of the learning process, helping to build technical skills and support clarity and reproducibility of this project.
+
+
 ---
 
 ## License
