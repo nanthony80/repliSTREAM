@@ -1,6 +1,7 @@
 # 🧬repliSTREAM🐟
 
 ### An Independent Learning Project Replicating Ballini et al. (2024) for Comparative Analysis of Bioinformatics Pipelines in eDNA Metabarcoding of Italian River Fish Communities
+<img width="602" height="293" alt="Screenshot 2025-09-22 at 11 12 22 AM" src="https://github.com/user-attachments/assets/57d60732-3d3f-4589-b69b-68e90d39d331" />
 
 ## Introduction
 
